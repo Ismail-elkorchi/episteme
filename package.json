@@ -34,7 +34,6 @@
     "extract:example": "node src/cli.js extract --manifest examples/manifest.json --out out --format json",
     "extract:md": "node src/cli.js extract --manifest examples/manifest.json --out out --format md",
     "manual-ingest": "node src/cli.js manual-ingest",
-    "postinstall": "node src/install/prepare-parser-stack-deps.mjs",
     "test:xml": "node tests/xml-extractor.test.js",
     "test:html-engine": "node tests/html-engine.contract.test.js",
     "test:html": "node tests/html-extractor.test.js",

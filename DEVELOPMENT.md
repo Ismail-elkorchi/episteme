@@ -69,7 +69,7 @@ Consumers use only the CLI and published package interfaces.
 - Non-goals: dynamic JS execution or headless browser rendering.
 - HTML extraction defaults to parser-stack (`html-parser` + `css-parser`).
 - HTML extraction uses a single engine path (parser-stack only).
-- Parser-stack dependencies are prepared at install time via `src/install/prepare-parser-stack-deps.mjs`.
+- Episteme does not build parser dependencies during install; parser-stack failures are handled by the remediation runbook in `docs/PARSER_STACK_REMEDIATION.md`.
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
 
