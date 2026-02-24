@@ -70,6 +70,7 @@ Consumers use only the CLI and published package interfaces.
 - HTML extraction uses linkedom instead of Playwright.
 - HTML engine can be selected with `EPISTEME_HTML_ENGINE` (`linkedom` default, `parser-stack` opt-in).
 - Parser-stack engine resolves parser modules from `html-parser`/`css-parser` package names or from `EPISTEME_HTML_PARSER_SPECIFIER`/`EPISTEME_CSS_PARSER_SPECIFIER`.
+- HTML parity harness compares `linkedom` and `parser-stack` on synthetic fixtures (`tests/html-parity.test.js`).
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
 
