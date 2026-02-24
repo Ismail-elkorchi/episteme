@@ -162,6 +162,7 @@ class ParserElement {
       if (rootIndex !== -1) {
         rootChildren.splice(rootIndex, 1);
       }
+      this._ownerDocument._recomputeMetadata();
       return;
     }
 
@@ -171,6 +172,7 @@ class ParserElement {
     }
     parent._contentParts = parent._contentParts.filter((part) => part !== this);
     this._parentElement = null;
+    this._ownerDocument._recomputeMetadata();
   }
 
   _appendText(text) {
@@ -205,6 +207,12 @@ class ParserDocument {
 
   set title(value) {
     this._title = value || "";
+  }
+
+  _recomputeMetadata() {
+    this.body = findFirstByTagName(this, "body") || this.children[0] || null;
+    const titleNode = findFirstByTagName(this, "title");
+    this.title = titleNode ? titleNode.textContent : "";
   }
 
   querySelector(selector) {
@@ -299,9 +307,7 @@ function buildDocumentTree(parsedTree, cssParser, url) {
     documentRef.children.push(childElement);
   }
 
-  documentRef.body = findFirstByTagName(documentRef, "body") || documentRef.children[0] || null;
-  const titleNode = findFirstByTagName(documentRef, "title");
-  documentRef.title = titleNode ? titleNode.textContent : "";
+  documentRef._recomputeMetadata();
   return documentRef;
 }
 
