@@ -1,0 +1,17 @@
+{
+  "id": "algorithms-grammar",
+  "url": "https://example.test/algorithms",
+  "rules": {
+    "rootSelector": "body",
+    "algorithmSelectors": [
+      "ol.algorithm",
+      ".algorithm > ol"
+    ],
+    "grammarSelectors": [
+      "pre.grammar"
+    ],
+    "pruneSelectors": []
+  },
+  "html": "<!doctype html><html><head><title>Algorithms</title></head><body><h1 id=\"alg\">Algorithms</h1><div class=\"algorithm\"><ol><li>Step one</li><li>Step two</li></ol></div><pre class=\"grammar\">Expr ::= Term (\"+\" Term)*</pre><table id=\"tbl\"><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td>1</td></tr><tr><td>B</td><td>2</td></tr></tbody></table></body></html>"
+}
+
