@@ -14,3 +14,6 @@ No orphaned or duplicate canonical docs are allowed.
 
 ## Collaboration Surfaces
 - [Pull Request Template](../.github/pull_request_template.md)
+
+## Runbooks
+- [Parser Stack Remediation](PARSER_STACK_REMEDIATION.md)
