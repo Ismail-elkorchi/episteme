@@ -40,7 +40,7 @@ Consumers use only the CLI and published package interfaces.
 - Checklist outcome: refresh validated; XML Schema 1.1 source added; coverage map updated.
 
 ## XML/XSD Extractor
-- XML extractor uses fast-xml-parser and produces XSD-aware sections.
+- XML extractor uses xml-parser and produces XSD-aware sections.
 - Parser captures attributes, groups, schema metadata, annotations, facets, and model summaries.
 
 ## Verification

@@ -1,4 +1,4 @@
-import { XMLParser } from "fast-xml-parser";
+import { parseXml } from "xml-parser";
 import { normalizeText } from "../utils.js";
 
 const XSD_SCHEMA_ATTRS = [
@@ -35,16 +35,10 @@ export function extractXmlDocument({
   documentType,
   title,
 }) {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-    allowBooleanAttributes: true,
-    trimValues: false,
-  });
-
   let parsed;
   try {
-    parsed = parser.parse(text || "");
+    const document = parseXml(text || "");
+    parsed = toExtractorTree(document);
   } catch (error) {
     return buildErrorDoc({
       url,
@@ -79,6 +73,57 @@ export function extractXmlDocument({
     sections,
     warnings: [],
   };
+}
+
+function toExtractorTree(document) {
+  const root = document?.root;
+  if (!root) {
+    return {};
+  }
+  return {
+    [root.qName]: toExtractorNode(root),
+  };
+}
+
+function toExtractorNode(node) {
+  if (!node || typeof node !== "object" || node.kind !== "element") {
+    return {};
+  }
+
+  const out = {};
+
+  for (const attr of node.attributes || []) {
+    out[`@_${attr.qName}`] = attr.value;
+  }
+
+  let text = "";
+  for (const child of node.children || []) {
+    if (child?.kind === "text") {
+      text += child.value || "";
+      continue;
+    }
+
+    if (child?.kind !== "element") {
+      continue;
+    }
+
+    const key = child.qName;
+    const childValue = toExtractorNode(child);
+    const previous = out[key];
+    if (previous === undefined) {
+      out[key] = childValue;
+    } else if (Array.isArray(previous)) {
+      previous.push(childValue);
+    } else {
+      out[key] = [previous, childValue];
+    }
+  }
+
+  if (text.length > 0) {
+    out["#text"] = text;
+  }
+
+  return out;
 }
 
 function buildErrorDoc({ url, family, authority, snapshotId, source, documentType, title, warning }) {
