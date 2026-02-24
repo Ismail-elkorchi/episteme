@@ -1,0 +1,46 @@
+name: Scope classification
+description: Classify ownership as upstream/downstream/not-in-scope/split.
+title: "scope: "
+labels: [triage, scope]
+body:
+  - type: input
+    id: incident_id
+    attributes:
+      label: Related incident ID
+      description: Use an existing incident ID or provide a new stable ID.
+      placeholder: INC-YYYY-MM-DD-###
+    validations:
+      required: true
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Classification
+      options:
+        - upstream
+        - downstream
+        - not-in-scope
+        - split
+    validations:
+      required: true
+  - type: checkboxes
+    id: components
+    attributes:
+      label: Components
+      options:
+        - label: episteme
+        - label: html-parser
+        - label: css-parser
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and deterministic checks
+      description: List exact commands and key observed outcomes.
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: Next action
+      description: State where follow-up issue/PR should be opened.
+    validations:
+      required: true

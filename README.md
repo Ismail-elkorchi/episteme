@@ -102,3 +102,6 @@ Optional:
 
 ## Compatibility
 - Full pipeline (HTML + PDF): Node.js 24+ (LTS), latest stable Deno, or latest stable Bun.
+
+## Incident Reporting
+- Parser-layer incident routing and required reproducibility fields: `docs/PARSER_INCIDENT_HANDOFF.md`.

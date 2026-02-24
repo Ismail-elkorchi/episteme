@@ -47,6 +47,7 @@ Consumers use only the CLI and published package interfaces.
 - Canonical command: `npm run check`
 - Holdout tier: `npm run check:holdout`
 - CI gate: `npm run check:ci`
+- Parser incident handoff contract: `docs/PARSER_INCIDENT_HANDOFF.md`
 - XML/XSD tests cover PREMIS facets and a synthetic XSD 1.1 assertion.
 - `test:xml` runs XML extractor tests.
 - XML root selection ignores XML declarations/processing instructions.
