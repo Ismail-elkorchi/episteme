@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { extractHtmlDocument } from "../src/extractors/html.js";
-import { createLinkedomHtmlEngine } from "../src/extractors/html-engine/linkedom.js";
+import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { assertSchema } from "./helpers/schema-validator.js";
 
-function buildDom(html, url) {
-  const engine = createLinkedomHtmlEngine();
+async function buildDom(html, url) {
+  const engine = await resolveHtmlEngine();
   return engine.parse({ html, url });
 }
 
@@ -22,7 +22,7 @@ async function testHtmlExtraction() {
 </body>
 </html>`;
 
-  const dom = buildDom(html, "https://example.test/doc");
+  const dom = await buildDom(html, "https://example.test/doc");
   const doc = extractHtmlDocument({
     rules: {
       rootSelector: "body",

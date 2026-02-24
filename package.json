@@ -37,16 +37,13 @@
     "postinstall": "node src/install/prepare-parser-stack-deps.mjs",
     "test:xml": "node tests/xml-extractor.test.js",
     "test:html-engine": "node tests/html-engine.contract.test.js",
-    "test:html-engine:parser-stack": "node tests/html-engine.parser-stack.test.js",
     "test:html": "node tests/html-extractor.test.js",
-    "test:html:parser-stack": "node tests/html-extractor.parser-stack.test.js",
-    "test:html:parity": "node tests/html-parity.test.js",
     "test:pdf": "node tests/pdf-extractor.test.js",
-    "test": "npm run test:xml && npm run test:html-engine && npm run test:html-engine:parser-stack && npm run test:html && npm run test:html:parser-stack && npm run test:html:parity && npm run test:pdf",
+    "test": "npm run test:xml && npm run test:html-engine && npm run test:html && npm run test:pdf",
     "check": "npm run test",
     "check:holdout": "node tests/holdout/xml-extractor.holdout.test.js",
-    "check:deno": "deno run --allow-read --node-modules-dir tests/xml-extractor.test.js && deno run --allow-read --node-modules-dir tests/html-engine.contract.test.js && deno run --allow-read --node-modules-dir tests/html-engine.parser-stack.test.js && deno run --allow-read --node-modules-dir tests/html-extractor.test.js && deno run --allow-read --node-modules-dir tests/html-extractor.parser-stack.test.js && deno run --allow-read --node-modules-dir tests/html-parity.test.js && deno run --allow-read --node-modules-dir tests/pdf-extractor.test.js",
-    "check:bun": "bun tests/xml-extractor.test.js && bun tests/html-engine.contract.test.js && bun tests/html-engine.parser-stack.test.js && bun tests/html-extractor.test.js && bun tests/html-extractor.parser-stack.test.js && bun tests/html-parity.test.js && bun tests/pdf-extractor.test.js",
+    "check:deno": "deno run --allow-read --node-modules-dir=manual tests/xml-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/html-engine.contract.test.js && deno run --allow-read --node-modules-dir=manual tests/html-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/pdf-extractor.test.js",
+    "check:bun": "bun tests/xml-extractor.test.js && bun tests/html-engine.contract.test.js && bun tests/html-extractor.test.js && bun tests/pdf-extractor.test.js",
     "package:check": "node scripts/verify-package.mjs",
     "check:ci": "npm run check && npm run check:holdout && npm run package:check"
   },
@@ -56,9 +53,6 @@
     "fast-xml-parser": "^4.4.1",
     "html-parser": "https://codeload.github.com/Ismail-elkorchi/html-parser/tar.gz/809a2c142cb12b85f6a713cb8d1189d6add472f2",
     "pdfjs-dist": "^4.10.38"
-  },
-  "devDependencies": {
-    "linkedom": "^0.18.6"
   },
   "license": "MIT"
 }
