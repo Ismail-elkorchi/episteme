@@ -57,6 +57,7 @@ Consumers use only the CLI and published package interfaces.
 - Schema verification: schema diff against output examples; fragment field check (manual until automated).
 - Consumer surface verification: `npm pack --dry-run`, jsr exclude validation, and package:check failure on leaked paths.
 - Distribution verification: `npm pack --dry-run`, scoped install check, and CLI bin continuity (`episteme`).
+- Parser artifact preparation: `npm run prepare:parser-stack` (also executed by `check:ci`, `check:deno`, and `check:bun`).
 
 ## Testing Fixtures
 - PREMIS XSD and W3C xml.xsd are baseline fixtures.
@@ -70,7 +71,7 @@ Consumers use only the CLI and published package interfaces.
 - Non-goals: dynamic JS execution or headless browser rendering.
 - HTML extraction defaults to parser-stack (`html-parser` + `css-parser`).
 - HTML extraction uses a single engine path (parser-stack only).
-- Episteme does not build parser dependencies during install; parser-stack failures are handled by the remediation runbook in `docs/PARSER_STACK_REMEDIATION.md`.
+- Episteme prepares parser-stack artifacts inside `node_modules` with `prepare:parser-stack` before runtime parity checks.
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
 
