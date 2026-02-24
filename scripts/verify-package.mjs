@@ -7,6 +7,7 @@ const root = process.cwd();
 const allowedPackPrefixes = [
   "package.json",
   "README.md",
+  "LICENSE",
   "schema/",
   "src/",
 ];
