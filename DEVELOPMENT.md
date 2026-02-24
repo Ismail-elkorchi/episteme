@@ -68,6 +68,8 @@ Consumers use only the CLI and published package interfaces.
 - Mandate: remove Playwright and pdftotext to enable Node/Deno/Bun parity.
 - Non-goals: dynamic JS execution or headless browser rendering.
 - HTML extraction uses linkedom instead of Playwright.
+- HTML engine can be selected with `EPISTEME_HTML_ENGINE` (`linkedom` default, `parser-stack` opt-in).
+- Parser-stack engine resolves parser modules from `html-parser`/`css-parser` package names or from `EPISTEME_HTML_PARSER_SPECIFIER`/`EPISTEME_CSS_PARSER_SPECIFIER`.
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
 
