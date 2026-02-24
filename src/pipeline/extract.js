@@ -1,12 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { parseHTML } from "linkedom";
 import { extractHtmlDocument } from "../extractors/html.js";
+import { createLinkedomHtmlEngine } from "../extractors/html-engine/linkedom.js";
 import { extractTextDocument } from "../extractors/text.js";
 import { extractPdfDocument } from "../extractors/pdf.js";
 import { extractXmlDocument } from "../extractors/xml.js";
 import { loadSnapshotIndex, loadSnapshotContent } from "./snapshot.js";
 import { extractFragment, sanitizeUrlToId, normalizeText, writeJson, ensureDir } from "../utils.js";
+
+const htmlEngine = createLinkedomHtmlEngine();
 
 export async function extractAll({ manifest, snapshotsDir, outDir, format = "json", plugins }) {
   const index = await loadSnapshotIndex(snapshotsDir);
@@ -84,7 +86,7 @@ async function extractFromSnapshot({
       return unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin });
     }
     const { html, warning } = decodeHtmlSnapshot(snapshot);
-    const dom = buildDom(html, sourceUrl);
+    const dom = htmlEngine.parse({ html, url: sourceUrl });
     const documentData = extractHtmlDocument({
       rules: plugin.rules,
       url: sourceUrl,
@@ -94,6 +96,7 @@ async function extractFromSnapshot({
       snapshotId: snapshot.meta.snapshotId,
       source: snapshot.meta,
       dom,
+      htmlEngine,
     });
     if (warning) {
       documentData.warnings = [...(documentData.warnings || []), warning];
@@ -161,25 +164,6 @@ async function extractFromSnapshot({
   }
 
   return unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin, extractorId });
-}
-
-function buildDom(html, url) {
-  const { document, window } = parseHTML(html || "");
-  if (document && url) {
-    const base = document.querySelector("base") || document.createElement("base");
-    base.setAttribute("href", url);
-    if (!base.parentNode && document.head) {
-      document.head.prepend(base);
-    }
-  }
-  return {
-    document,
-    window,
-    NodeFilter: window?.NodeFilter,
-    HTMLElement: window?.HTMLElement,
-    Element: window?.Element,
-    location: { href: url },
-  };
 }
 
 function unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin, extractorId }) {
