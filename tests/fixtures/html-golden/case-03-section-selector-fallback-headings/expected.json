@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-03-section-selector-fallback-headings",
+  "title": "Case 03",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-03-section-selector-fallback-headings",
+  "source": {
+    "fixtureId": "case-03-section-selector-fallback-headings"
+  },
+  "sections": [
+    {
+      "id": "primary",
+      "heading": "Primary",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-03-section-selector-fallback-headings",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Primary paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-03-section-selector-fallback-headings#primary",
+        "fragment": "primary",
+        "path": "h1:nth-of-type(1)"
+      }
+    },
+    {
+      "id": null,
+      "heading": "Secondary",
+      "level": 2,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-03-section-selector-fallback-headings",
+            "fragment": null,
+            "path": "p:nth-of-type(2)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Secondary paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-03-section-selector-fallback-headings",
+        "fragment": null,
+        "path": "h2:nth-of-type(1)"
+      }
+    }
+  ]
+}

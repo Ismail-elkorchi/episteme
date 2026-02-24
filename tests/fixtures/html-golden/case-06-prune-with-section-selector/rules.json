@@ -1,0 +1,5 @@
+{
+  "rootSelector": "body",
+  "sectionSelector": "section.piece",
+  "pruneSelectors": ["section#left .drop"]
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-07-block-paragraph-pre-code",
+  "title": "Case 07",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-07-block-paragraph-pre-code",
+  "source": {
+    "fixtureId": "case-07-block-paragraph-pre-code"
+  },
+  "sections": [
+    {
+      "id": "blocks",
+      "heading": "Blocks",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-07-block-paragraph-pre-code",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Paragraph content."
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-07-block-paragraph-pre-code",
+            "fragment": null,
+            "path": "pre:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "code",
+          "text": "line one\n\nline two\n\nline three"
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-07-block-paragraph-pre-code",
+            "fragment": null,
+            "path": "emu-code:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "code",
+          "text": "const value = 1;"
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-07-block-paragraph-pre-code#blocks",
+        "fragment": "blocks",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

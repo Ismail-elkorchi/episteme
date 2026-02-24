@@ -1,0 +1,7 @@
+{
+  "rootSelector": "body",
+  "informativeClasses": ["hint"],
+  "exampleClasses": ["demo"],
+  "normativeClasses": ["must"],
+  "pruneSelectors": []
+}

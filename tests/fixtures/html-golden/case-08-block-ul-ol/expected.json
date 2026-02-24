@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-08-block-ul-ol",
+  "title": "Case 08",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-08-block-ul-ol",
+  "source": {
+    "fixtureId": "case-08-block-ul-ol"
+  },
+  "sections": [
+    {
+      "id": "lists",
+      "heading": "Lists",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-08-block-ul-ol",
+            "fragment": null,
+            "path": "ul:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "Alpha",
+            "Beta"
+          ]
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-08-block-ul-ol",
+            "fragment": null,
+            "path": "ol:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "One",
+            "Two"
+          ]
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-08-block-ul-ol#lists",
+        "fragment": "lists",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}
