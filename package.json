@@ -40,12 +40,13 @@
     "test:html:golden": "node tests/html-golden.test.js",
     "test:pdf": "node tests/pdf-extractor.test.js",
     "test": "npm run test:xml && npm run test:html-engine && npm run test:html && npm run test:html:golden && npm run test:pdf",
+    "prepare:parser-stack": "node scripts/install/prepare-parser-stack-deps.mjs",
     "check": "npm run test",
     "check:holdout": "node tests/holdout/xml-extractor.holdout.test.js",
-    "check:deno": "deno run --allow-read --node-modules-dir=manual tests/xml-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/html-engine.contract.test.js && deno run --allow-read --node-modules-dir=manual tests/html-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/html-golden.test.js && deno run --allow-read --node-modules-dir=manual tests/pdf-extractor.test.js",
-    "check:bun": "bun tests/xml-extractor.test.js && bun tests/html-engine.contract.test.js && bun tests/html-extractor.test.js && bun tests/html-golden.test.js && bun tests/pdf-extractor.test.js",
+    "check:deno": "npm run prepare:parser-stack && deno run --allow-read --node-modules-dir=manual tests/xml-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/html-engine.contract.test.js && deno run --allow-read --node-modules-dir=manual tests/html-extractor.test.js && deno run --allow-read --node-modules-dir=manual tests/html-golden.test.js && deno run --allow-read --node-modules-dir=manual tests/pdf-extractor.test.js",
+    "check:bun": "npm run prepare:parser-stack && bun tests/xml-extractor.test.js && bun tests/html-engine.contract.test.js && bun tests/html-extractor.test.js && bun tests/html-golden.test.js && bun tests/pdf-extractor.test.js",
     "package:check": "node scripts/verify-package.mjs",
-    "check:ci": "npm run check && npm run check:holdout && npm run package:check"
+    "check:ci": "npm run prepare:parser-stack && npm run check && npm run check:holdout && npm run package:check"
   },
   "dependencies": {
     "ajv": "^8.18.0",
