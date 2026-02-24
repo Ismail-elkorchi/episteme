@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-14-source-path-fragment",
+  "title": "Case 14",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-14-source-path-fragment",
+  "source": {
+    "fixtureId": "case-14-source-path-fragment"
+  },
+  "sections": [
+    {
+      "id": "sec-14",
+      "heading": "Path Source",
+      "level": 2,
+      "blocks": [
+        {
+          "id": "para-id",
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-14-source-path-fragment#para-id",
+            "fragment": "para-id",
+            "path": "main:nth-of-type(1) > p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Paragraph id source."
+        },
+        {
+          "id": "named-anchor",
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-14-source-path-fragment#named-anchor",
+            "fragment": "named-anchor",
+            "path": "main:nth-of-type(1) > p:nth-of-type(2)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Paragraph named anchor source."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-14-source-path-fragment#sec-14",
+        "fragment": "sec-14",
+        "path": "main:nth-of-type(1) > h2:nth-of-type(1)"
+      }
+    }
+  ]
+}

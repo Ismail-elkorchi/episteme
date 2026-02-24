@@ -1,0 +1,6 @@
+{
+  "rootSelector": "body",
+  "algorithmSelectors": ["emu-alg"],
+  "grammarSelectors": ["emu-grammar"],
+  "pruneSelectors": []
+}

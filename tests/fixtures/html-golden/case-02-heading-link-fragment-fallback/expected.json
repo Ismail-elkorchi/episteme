@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-02-heading-link-fragment-fallback",
+  "title": "Case 02",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-02-heading-link-fragment-fallback",
+  "source": {
+    "fixtureId": "case-02-heading-link-fragment-fallback"
+  },
+  "sections": [
+    {
+      "id": "linked-fragment",
+      "heading": "Linked Heading",
+      "level": 3,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-02-heading-link-fragment-fallback",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Section paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-02-heading-link-fragment-fallback#linked-fragment",
+        "fragment": "linked-fragment",
+        "path": "h3:nth-of-type(1)"
+      }
+    }
+  ]
+}

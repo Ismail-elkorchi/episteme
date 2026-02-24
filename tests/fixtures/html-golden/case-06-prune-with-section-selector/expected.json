@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-06-prune-with-section-selector",
+  "title": "Case 06",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-06-prune-with-section-selector",
+  "source": {
+    "fixtureId": "case-06-prune-with-section-selector"
+  },
+  "sections": [
+    {
+      "id": "left",
+      "heading": "Left",
+      "level": 2,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-06-prune-with-section-selector",
+            "fragment": null,
+            "path": "section:nth-of-type(1) > p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Left kept paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-06-prune-with-section-selector#left",
+        "fragment": "left",
+        "path": "section:nth-of-type(1) > h2:nth-of-type(1)"
+      }
+    },
+    {
+      "id": "right",
+      "heading": "Right",
+      "level": 2,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-06-prune-with-section-selector",
+            "fragment": null,
+            "path": "section:nth-of-type(2) > p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Right kept paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-06-prune-with-section-selector#right",
+        "fragment": "right",
+        "path": "section:nth-of-type(2) > h2:nth-of-type(1)"
+      }
+    }
+  ]
+}

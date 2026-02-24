@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-09-block-table",
+  "title": "Case 09",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-09-block-table",
+  "source": {
+    "fixtureId": "case-09-block-table"
+  },
+  "sections": [
+    {
+      "id": "table",
+      "heading": "Table",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-09-block-table",
+            "fragment": null,
+            "path": "table:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "table",
+          "headers": [
+            "Name",
+            "Value"
+          ],
+          "rows": [
+            [
+              "A",
+              "1"
+            ],
+            [
+              "B",
+              "2"
+            ]
+          ]
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-09-block-table#table",
+        "fragment": "table",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-10-block-blockquote-dl",
+  "title": "Case 10",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-10-block-blockquote-dl",
+  "source": {
+    "fixtureId": "case-10-block-blockquote-dl"
+  },
+  "sections": [
+    {
+      "id": "notes",
+      "heading": "Notes",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-10-block-blockquote-dl",
+            "fragment": null,
+            "path": "blockquote:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "note",
+          "text": "Quoted text here."
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-10-block-blockquote-dl",
+            "fragment": null,
+            "path": "dl:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "definitionList",
+          "items": [
+            {
+              "term": "Term A",
+              "definition": "Definition A1. Definition A2."
+            },
+            {
+              "term": "Term B",
+              "definition": "Definition B."
+            }
+          ]
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-10-block-blockquote-dl#notes",
+        "fragment": "notes",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

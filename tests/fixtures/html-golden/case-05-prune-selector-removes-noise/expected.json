@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-05-prune-selector-removes-noise",
+  "title": "Case 05",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-05-prune-selector-removes-noise",
+  "source": {
+    "fixtureId": "case-05-prune-selector-removes-noise"
+  },
+  "sections": [
+    {
+      "id": "core",
+      "heading": "Core",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-05-prune-selector-removes-noise",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Keep this paragraph."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-05-prune-selector-removes-noise#core",
+        "fragment": "core",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

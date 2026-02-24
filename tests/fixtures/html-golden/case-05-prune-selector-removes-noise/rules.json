@@ -1,0 +1,4 @@
+{
+  "rootSelector": "body",
+  "pruneSelectors": [".noise", "script"]
+}

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-12-whitespace-normalization",
+  "title": "Case 12",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-12-whitespace-normalization",
+  "source": {
+    "fixtureId": "case-12-whitespace-normalization"
+  },
+  "sections": [
+    {
+      "id": "space",
+      "heading": "Space\\n Heading",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-12-whitespace-normalization",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "First line\\n\\nSecond\\tline."
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-12-whitespace-normalization",
+            "fragment": null,
+            "path": "ul:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "list",
+          "ordered": false,
+          "items": [
+            "Item One",
+            "Item\\nTwo"
+          ]
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-12-whitespace-normalization#space",
+        "fragment": "space",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

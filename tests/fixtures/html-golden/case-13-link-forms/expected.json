@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/case-13-link-forms",
+  "title": "Case 13",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-case-13-link-forms",
+  "source": {
+    "fixtureId": "case-13-link-forms"
+  },
+  "sections": [
+    {
+      "id": "links",
+      "heading": "Links",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/case-13-link-forms",
+            "fragment": null,
+            "path": "p:nth-of-type(1)"
+          },
+          "links": [
+            {
+              "text": "absolute",
+              "href": "https://example.org/path",
+              "resolvedId": null
+            },
+            {
+              "text": "relative",
+              "href": "/relative/path",
+              "resolvedId": null
+            },
+            {
+              "text": "fragment",
+              "href": "#local-fragment",
+              "resolvedId": "local-fragment"
+            },
+            {
+              "text": "mail",
+              "href": "mailto:dev@example.test",
+              "resolvedId": null
+            }
+          ],
+          "type": "paragraph",
+          "text": "absolute relative fragment mail"
+        }
+      ],
+      "source": {
+        "url": "https://example.test/case-13-link-forms#links",
+        "fragment": "links",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

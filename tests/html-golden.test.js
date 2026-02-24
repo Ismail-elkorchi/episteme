@@ -4,6 +4,10 @@ import path from "node:path";
 import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { extractHtmlDocument } from "../src/extractors/html.js";
 
+// Fixture conventions:
+// - one directory per case id under tests/fixtures/html-golden
+// - each fixture directory contains input.html, rules.json, expected.json
+// - ids remain stable and lexically sortable for deterministic ordering
 const FIXTURES_ROOT = path.join("tests", "fixtures", "html-golden");
 
 function normalizeExtractedDocument(documentData) {
@@ -69,4 +73,3 @@ run().catch((error) => {
   console.error("html golden fixture tests failed", error);
   process.exit(1);
 });
-
