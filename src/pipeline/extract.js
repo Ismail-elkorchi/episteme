@@ -1,14 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { extractHtmlDocument } from "../extractors/html.js";
-import { createLinkedomHtmlEngine } from "../extractors/html-engine/linkedom.js";
+import { resolveHtmlEngine } from "../extractors/html-engine/index.js";
 import { extractTextDocument } from "../extractors/text.js";
 import { extractPdfDocument } from "../extractors/pdf.js";
 import { extractXmlDocument } from "../extractors/xml.js";
 import { loadSnapshotIndex, loadSnapshotContent } from "./snapshot.js";
 import { extractFragment, sanitizeUrlToId, normalizeText, writeJson, ensureDir } from "../utils.js";
 
-const htmlEngine = createLinkedomHtmlEngine();
+let htmlEnginePromise = null;
 
 export async function extractAll({ manifest, snapshotsDir, outDir, format = "json", plugins }) {
   const index = await loadSnapshotIndex(snapshotsDir);
@@ -86,6 +86,7 @@ async function extractFromSnapshot({
       return unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin });
     }
     const { html, warning } = decodeHtmlSnapshot(snapshot);
+    const htmlEngine = await getHtmlEngine();
     const dom = htmlEngine.parse({ html, url: sourceUrl });
     const documentData = extractHtmlDocument({
       rules: plugin.rules,
@@ -164,6 +165,13 @@ async function extractFromSnapshot({
   }
 
   return unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin, extractorId });
+}
+
+async function getHtmlEngine() {
+  if (!htmlEnginePromise) {
+    htmlEnginePromise = resolveHtmlEngine();
+  }
+  return htmlEnginePromise;
 }
 
 function unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin, extractorId }) {
