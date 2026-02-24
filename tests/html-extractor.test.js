@@ -1,18 +1,11 @@
 import assert from "node:assert/strict";
-import { parseHTML } from "linkedom";
 import { extractHtmlDocument } from "../src/extractors/html.js";
+import { createLinkedomHtmlEngine } from "../src/extractors/html-engine/linkedom.js";
 import { assertSchema } from "./helpers/schema-validator.js";
 
 function buildDom(html, url) {
-  const { document, window } = parseHTML(html);
-  return {
-    document,
-    window,
-    NodeFilter: window?.NodeFilter,
-    HTMLElement: window?.HTMLElement,
-    Element: window?.Element,
-    location: { href: url },
-  };
+  const engine = createLinkedomHtmlEngine();
+  return engine.parse({ html, url });
 }
 
 async function testHtmlExtraction() {
