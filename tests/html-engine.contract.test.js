@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { createLinkedomHtmlEngine } from "../src/extractors/html-engine/linkedom.js";
+import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { assertHtmlEngineContract } from "../src/extractors/html-engine/contract.js";
 
 async function testContractValidation() {
-  const engine = createLinkedomHtmlEngine();
+  const engine = await resolveHtmlEngine();
   assert.equal(assertHtmlEngineContract(engine), engine);
 
   assert.throws(
@@ -15,8 +15,8 @@ async function testContractValidation() {
   );
 }
 
-async function testLinkedomEngineSurface() {
-  const engine = createLinkedomHtmlEngine();
+async function testParserStackEngineSurface() {
+  const engine = await resolveHtmlEngine();
   const dom = engine.parse({
     html: `<!doctype html>
 <html>
@@ -54,7 +54,7 @@ async function testLinkedomEngineSurface() {
 
 async function run() {
   await testContractValidation();
-  await testLinkedomEngineSurface();
+  await testParserStackEngineSurface();
   console.log("html-engine contract tests passed");
 }
 
@@ -62,4 +62,3 @@ run().catch((error) => {
   console.error("html-engine contract tests failed", error);
   process.exit(1);
 });
-

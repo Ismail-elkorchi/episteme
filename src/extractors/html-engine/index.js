@@ -1,7 +1,6 @@
 import { createParserStackHtmlEngine } from "./parser-stack.js";
 
 const DEFAULT_HTML_ENGINE = "parser-stack";
-const HTML_ENGINE_ENV = "EPISTEME_HTML_ENGINE";
 const HTML_PARSER_SPECIFIER_ENV = "EPISTEME_HTML_PARSER_SPECIFIER";
 const CSS_PARSER_SPECIFIER_ENV = "EPISTEME_CSS_PARSER_SPECIFIER";
 
@@ -21,10 +20,7 @@ function normalizeEngineId(value) {
   if (normalized === "parser") {
     return "parser-stack";
   }
-  if (normalized === "html-parser-css-parser") {
-    return "parser-stack";
-  }
-  return normalized;
+  return DEFAULT_HTML_ENGINE;
 }
 
 function parserStackHtmlModuleSpecifiers() {
@@ -70,35 +66,14 @@ export async function loadParserStackModules() {
   };
 }
 
-export function getRequestedHtmlEngineId() {
-  return normalizeEngineId(readOptionalEnv(HTML_ENGINE_ENV));
-}
-
-export async function resolveHtmlEngine({ engine } = {}) {
-  const engineId = normalizeEngineId(engine || readOptionalEnv(HTML_ENGINE_ENV));
-  if (engineId === "parser-stack") {
-    try {
-      const modules = await loadParserStackModules();
-      return createParserStackHtmlEngine(modules);
-    } catch (error) {
-      throw new Error(
-        `Unable to load parser stack modules for engine "${engineId}": ${error?.message || String(error)}`,
-      );
-    }
+export async function resolveHtmlEngine() {
+  const engineId = normalizeEngineId();
+  try {
+    const modules = await loadParserStackModules();
+    return createParserStackHtmlEngine(modules);
+  } catch (error) {
+    throw new Error(
+      `Unable to load parser stack modules for engine "${engineId}": ${error?.message || String(error)}`,
+    );
   }
-
-  if (engineId === "linkedom") {
-    try {
-      const module = await import("./linkedom.js");
-      return module.createLinkedomHtmlEngine();
-    } catch (error) {
-      throw new Error(
-        `Unable to load linkedom modules for engine "${engineId}": ${error?.message || String(error)}`,
-      );
-    }
-  }
-
-  throw new Error(
-    `Unsupported html engine "${engineId}". Supported engines: "parser-stack", "linkedom"`,
-  );
 }
