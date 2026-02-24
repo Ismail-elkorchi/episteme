@@ -1,0 +1,5 @@
+{
+  "rootSelector": "main, body",
+  "sectionSelector": "section",
+  "pruneSelectors": ["nav", ".remove"]
+}

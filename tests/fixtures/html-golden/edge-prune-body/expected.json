@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/edge-prune-body",
+  "title": "Pruned Body",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-edge-prune-body",
+  "source": {
+    "fixtureId": "edge-prune-body"
+  },
+  "sections": [
+    {
+      "id": null,
+      "heading": "Pruned Body",
+      "level": 1,
+      "blocks": [],
+      "source": {
+        "url": "https://example.test/edge-prune-body",
+        "fragment": null,
+        "path": ""
+      }
+    }
+  ]
+}

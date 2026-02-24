@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head><title>Section Prune</title></head>
+<body>
+  <nav><a href="#gone">Should be pruned</a></nav>
+  <main>
+    <section id="s1">
+      <h2>Scope</h2>
+      <p>Keep this sentence.</p>
+      <div class="remove"><p>Drop this sentence.</p></div>
+    </section>
+    <section id="s2" class="example">
+      <h2>Examples</h2>
+      <p>Contains <a href="https://example.test/x">external link</a> and <a href="#local">local</a>.</p>
+    </section>
+  </main>
+</body>
+</html>
