@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/section-prune",
+  "title": "Section Prune",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-section-prune",
+  "source": {
+    "fixtureId": "section-prune"
+  },
+  "sections": [
+    {
+      "id": "s1",
+      "heading": "Scope",
+      "level": 2,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/section-prune",
+            "fragment": null,
+            "path": "main:nth-of-type(1) > section:nth-of-type(1) > p:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "paragraph",
+          "text": "Keep this sentence."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/section-prune#s1",
+        "fragment": "s1",
+        "path": "main:nth-of-type(1) > section:nth-of-type(1) > h2:nth-of-type(1)"
+      }
+    },
+    {
+      "id": "s2",
+      "heading": "Examples",
+      "level": 2,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "example",
+          "source": {
+            "url": "https://example.test/section-prune",
+            "fragment": null,
+            "path": "main:nth-of-type(1) > section:nth-of-type(2) > p:nth-of-type(1)"
+          },
+          "links": [
+            {
+              "text": "external link",
+              "href": "https://example.test/x",
+              "resolvedId": null
+            },
+            {
+              "text": "local",
+              "href": "#local",
+              "resolvedId": "local"
+            }
+          ],
+          "type": "paragraph",
+          "text": "Contains external link and local."
+        }
+      ],
+      "source": {
+        "url": "https://example.test/section-prune#s2",
+        "fragment": "s2",
+        "path": "main:nth-of-type(1) > section:nth-of-type(2) > h2:nth-of-type(1)"
+      }
+    }
+  ]
+}

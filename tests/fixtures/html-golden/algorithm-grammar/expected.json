@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "0.2",
+  "url": "https://example.test/algorithm-grammar",
+  "title": "Algorithm Grammar",
+  "family": "generic",
+  "authority": "informative",
+  "documentType": null,
+  "snapshotId": "fixture-algorithm-grammar",
+  "source": {
+    "fixtureId": "algorithm-grammar"
+  },
+  "sections": [
+    {
+      "id": "alg",
+      "heading": "Algorithms",
+      "level": 1,
+      "blocks": [
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/algorithm-grammar",
+            "fragment": null,
+            "path": "div:nth-of-type(1) > ol:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "algorithm",
+          "title": "Algorithms",
+          "steps": [
+            {
+              "stepId": "1",
+              "text": "Initialize state"
+            },
+            {
+              "stepId": "2",
+              "text": "Return result"
+            }
+          ]
+        },
+        {
+          "id": null,
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/algorithm-grammar",
+            "fragment": null,
+            "path": "pre:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "grammar",
+          "productions": [
+            {
+              "lhs": "Expr",
+              "rhs": "Term (\"+\" Term)*"
+            }
+          ]
+        },
+        {
+          "id": "tbl",
+          "normativity": "informative",
+          "source": {
+            "url": "https://example.test/algorithm-grammar#tbl",
+            "fragment": "tbl",
+            "path": "table:nth-of-type(1)"
+          },
+          "links": [],
+          "type": "table",
+          "headers": [
+            "Name",
+            "Value"
+          ],
+          "rows": [
+            [
+              "A",
+              "1"
+            ],
+            [
+              "B",
+              "2"
+            ]
+          ]
+        }
+      ],
+      "source": {
+        "url": "https://example.test/algorithm-grammar#alg",
+        "fragment": "alg",
+        "path": "h1:nth-of-type(1)"
+      }
+    }
+  ]
+}

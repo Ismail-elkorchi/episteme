@@ -1,0 +1,6 @@
+{
+  "rootSelector": "body",
+  "algorithmSelectors": ["ol.algorithm", ".algorithm > ol"],
+  "grammarSelectors": ["pre.grammar"],
+  "pruneSelectors": []
+}
