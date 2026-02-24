@@ -1,0 +1,81 @@
+name: Parser incident
+description: Report a parser-layer incident with deterministic synthetic repro.
+title: "incident(parser): "
+labels: [bug, parser-incident]
+body:
+  - type: input
+    id: incident_id
+    attributes:
+      label: Incident ID
+      description: Stable identifier (example: INC-2026-02-24-001).
+      placeholder: INC-YYYY-MM-DD-###
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - S1
+        - S2
+        - S3
+    validations:
+      required: true
+  - type: dropdown
+    id: suspected_owner
+    attributes:
+      label: Suspected owner
+      options:
+        - episteme
+        - html-parser
+        - css-parser
+        - unknown
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope classification
+      options:
+        - upstream
+        - downstream
+        - not-in-scope
+        - split
+        - unknown
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe expected vs actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: synthetic_repro
+    attributes:
+      label: Synthetic reproducer
+      description: Provide minimal synthetic HTML/CSS/input only; no raw page dumps.
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Deterministic command(s)
+      description: Include exact commands to reproduce deterministically.
+      placeholder: |
+        npm test
+        npm run check:deno
+    validations:
+      required: true
+  - type: textarea
+    id: runtime_matrix
+    attributes:
+      label: Runtime matrix
+      description: Provide node/deno/bun results.
+      placeholder: |
+        node: pass/fail
+        deno: pass/fail
+        bun: pass/fail
+    validations:
+      required: true

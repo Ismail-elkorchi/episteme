@@ -19,6 +19,10 @@ For release-impacting changes:
 - Keep docs in present tense and aligned with current behavior.
 - Keep `docs/INDEX.md` canonical for all Markdown files.
 
+## Parser incident handoff
+- Use `docs/PARSER_INCIDENT_HANDOFF.md` for parser incident routing, severity labels, and required reproducibility fields.
+- Use the `Parser incident` and `Scope classification` issue templates for deterministic synthetic reports.
+
 ## Data handling
 - Do not commit raw real-world web content to git.
 - Use synthetic fixtures for reproductions whenever possible.

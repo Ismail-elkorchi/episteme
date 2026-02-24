@@ -17,3 +17,4 @@ No orphaned or duplicate canonical docs are allowed.
 
 ## Runbooks
 - [Parser Stack Remediation](PARSER_STACK_REMEDIATION.md)
+- [Parser Incident Handoff](PARSER_INCIDENT_HANDOFF.md)
