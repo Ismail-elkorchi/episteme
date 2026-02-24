@@ -2,7 +2,6 @@
   "version": "5",
   "specifiers": {
     "npm:ajv@^8.18.0": "8.18.0",
-    "npm:fast-xml-parser@^4.4.1": "4.5.3",
     "npm:pdfjs-dist@^4.10.38": "4.10.38"
   },
   "npm": {
@@ -119,7 +118,6 @@
     "packageJson": {
       "dependencies": [
         "npm:ajv@^8.18.0",
-        "npm:fast-xml-parser@^4.4.1",
         "npm:pdfjs-dist@^4.10.38"
       ]
     }

@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 const PACKAGES = [
   { name: "html-parser", skipPlaywrightDownload: false },
   { name: "css-parser", skipPlaywrightDownload: true },
+  { name: "xml-parser", skipPlaywrightDownload: false },
 ];
 
 function run(command, args, env) {
