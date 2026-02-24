@@ -67,9 +67,9 @@ Consumers use only the CLI and published package interfaces.
 ## Runtime Parity
 - Mandate: remove Playwright and pdftotext to enable Node/Deno/Bun parity.
 - Non-goals: dynamic JS execution or headless browser rendering.
-- HTML extraction uses linkedom instead of Playwright.
-- HTML engine can be selected with `EPISTEME_HTML_ENGINE` (`linkedom` default, `parser-stack` opt-in).
-- Parser-stack engine resolves parser modules from `html-parser`/`css-parser` package names or from `EPISTEME_HTML_PARSER_SPECIFIER`/`EPISTEME_CSS_PARSER_SPECIFIER`.
+- HTML extraction defaults to parser-stack (`html-parser` + `css-parser`).
+- HTML engine can be selected with `EPISTEME_HTML_ENGINE` (`parser-stack` default, `linkedom` optional).
+- Parser-stack dependencies are prepared at install time via `src/install/prepare-parser-stack-deps.mjs`.
 - HTML parity harness compares `linkedom` and `parser-stack` on synthetic fixtures (`tests/html-parity.test.js`).
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
@@ -83,8 +83,8 @@ Consumers use only the CLI and published package interfaces.
 ## Decision Rationale
 
 ### Runtime Parity (HTML/PDF)
-- Candidate methods: keep Playwright + pdftotext (Node-only), switch to linkedom + pdfjs-dist, add runtime-specific adapters, or drop HTML/PDF parity.
-- Mapping: Node-only fails parity; JS-only provides a single path; adapters increase drift risk; dropping parity violates consumer requirements.
+- Candidate methods: keep Playwright + pdftotext (Node-only), use parser-stack + pdfjs-dist, add runtime-specific adapters, or drop HTML/PDF parity.
+- Mapping: Node-only fails parity; parser-stack + JS PDF provides a single cross-runtime path; adapters increase drift risk; dropping parity violates consumer requirements.
 
 ### Schema Alignment
 - Candidate methods: leave schema unchanged, update title + add fragment, remove schema, or mark schema as deprecated.
