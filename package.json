@@ -34,6 +34,7 @@
     "extract:example": "node src/cli.js extract --manifest examples/manifest.json --out out --format json",
     "extract:md": "node src/cli.js extract --manifest examples/manifest.json --out out --format md",
     "manual-ingest": "node src/cli.js manual-ingest",
+    "postinstall": "node src/install/prepare-parser-stack-deps.mjs",
     "test:xml": "node tests/xml-extractor.test.js",
     "test:html-engine": "node tests/html-engine.contract.test.js",
     "test:html-engine:parser-stack": "node tests/html-engine.parser-stack.test.js",
@@ -51,9 +52,13 @@
   },
   "dependencies": {
     "ajv": "^8.18.0",
+    "css-parser": "https://codeload.github.com/Ismail-elkorchi/css-parser/tar.gz/98b6c7bacf53a5b08032fd3b8959fc094a7a065c",
     "fast-xml-parser": "^4.4.1",
-    "linkedom": "^0.18.6",
+    "html-parser": "https://codeload.github.com/Ismail-elkorchi/html-parser/tar.gz/809a2c142cb12b85f6a713cb8d1189d6add472f2",
     "pdfjs-dist": "^4.10.38"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.6"
   },
   "license": "MIT"
 }

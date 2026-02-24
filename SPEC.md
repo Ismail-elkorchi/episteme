@@ -50,7 +50,7 @@ A Claim with missing or inconclusive Evidence. Undecided claims must not be pres
 - Stability vs generativity: favor stability and cross-runtime determinism over dynamic rendering.
 - Complexity budget: moderate; acceptable to add small parsing dependencies.
 - Security posture: avoid external binaries and reduce runtime permissions.
-- Chosen approach: linkedom for HTML and pdfjs-dist for PDF (single JS-only path).
+- Chosen approach: parser-stack (`html-parser` + `css-parser`) for HTML and pdfjs-dist for PDF (single JS-only path).
 - Trade-offs: reduced dynamic rendering fidelity; reliance on JS parsers.
 
 ### Consumer Surface
