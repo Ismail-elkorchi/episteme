@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Episteme Document",
+  "type": "object",
+  "required": ["schemaVersion", "url", "title", "family", "sections", "extractedAt"],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "url": { "type": "string" },
+    "title": { "type": "string" },
+    "family": { "type": "string" },
+    "authority": { "type": "string" },
+    "documentType": { "type": ["string", "null"] },
+    "snapshotId": { "type": ["string", "null"] },
+    "fragment": { "type": ["string", "null"] },
+    "source": { "$ref": "#/definitions/source" },
+    "extractedAt": { "type": "string" },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/section" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "definitions": {
+    "source": {
+      "type": ["object", "null"],
+      "properties": {
+        "snapshotId": { "type": "string" },
+        "sourceUrl": { "type": "string" },
+        "finalUrl": { "type": "string" },
+        "contentType": { "type": "string" },
+        "charset": { "type": ["string", "null"] },
+        "bytes": { "type": "number" },
+        "sha256": { "type": "string" },
+        "fetchedAt": { "type": "string" },
+        "fileName": { "type": "string" }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["heading", "level", "blocks"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "heading": { "type": "string" },
+        "level": { "type": "number" },
+        "blocks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/block" }
+        },
+        "source": { "$ref": "#/definitions/blockSource" }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "type": { "type": "string" },
+        "text": { "type": ["string", "null"] },
+        "ordered": { "type": "boolean" },
+        "items": { "type": "array" },
+        "headers": { "type": "array" },
+        "rows": { "type": "array" },
+        "normativity": { "type": ["string", "null"] },
+        "source": { "$ref": "#/definitions/blockSource" },
+        "links": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/link" }
+        },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/step" }
+        },
+        "productions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/production" }
+        },
+        "title": { "type": ["string", "null"] }
+      }
+    },
+    "blockSource": {
+      "type": ["object", "null"],
+      "properties": {
+        "url": { "type": "string" },
+        "fragment": { "type": ["string", "null"] },
+        "path": { "type": ["string", "null"] }
+      }
+    },
+    "link": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "href": { "type": "string" },
+        "resolvedId": { "type": ["string", "null"] }
+      }
+    },
+    "step": {
+      "type": "object",
+      "properties": {
+        "stepId": { "type": "string" },
+        "text": { "type": "string" }
+      }
+    },
+    "production": {
+      "type": "object",
+      "properties": {
+        "lhs": { "type": "string" },
+        "rhs": { "type": "string" }
+      }
+    }
+  }
+}

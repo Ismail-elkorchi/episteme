@@ -1,0 +1,58 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.toolversions.outputs.node }}
+      - run: npm install
+      - run: npm run check:ci
+
+  deno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> $GITHUB_OUTPUT
+          echo "deno=$(awk '/^deno /{print $2}' .tool-versions)" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.toolversions.outputs.node }}
+      - run: npm install
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ steps.toolversions.outputs.deno }}
+      - run: deno run --allow-read --node-modules-dir tests/xml-extractor.test.js
+      - run: deno run --allow-read --node-modules-dir tests/html-extractor.test.js
+      - run: deno run --allow-read --node-modules-dir tests/pdf-extractor.test.js
+      - run: deno run --allow-read --node-modules-dir tests/holdout/xml-extractor.holdout.test.js
+
+  bun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "bun=$(awk '/^bun /{print $2}' .tool-versions)" >> $GITHUB_OUTPUT
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ steps.toolversions.outputs.bun }}
+      - run: bun install
+      - run: bun tests/xml-extractor.test.js
+      - run: bun tests/html-extractor.test.js
+      - run: bun tests/pdf-extractor.test.js
+      - run: bun tests/holdout/xml-extractor.holdout.test.js

@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://encoding.spec.whatwg.org/",
+    "family": "whatwg"
+  },
+  {
+    "url": "https://url.spec.whatwg.org/",
+    "family": "whatwg"
+  },
+  {
+    "url": "https://www.w3.org/TR/webcrypto-2/",
+    "family": "w3c"
+  },
+  {
+    "url": "https://www.unicode.org/reports/tr41/",
+    "family": "unicode"
+  },
+  {
+    "url": "https://tc39.es/ecma262/",
+    "family": "tc39"
+  },
+  {
+    "url": "https://www.rfc-editor.org/rfc/rfc8259",
+    "family": "rfc"
+  }
+]
