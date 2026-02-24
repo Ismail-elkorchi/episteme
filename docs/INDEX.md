@@ -9,3 +9,8 @@ No orphaned or duplicate canonical docs are allowed.
 - [README.md](../README.md)
 - [SPEC.md](../SPEC.md)
 - [DEVELOPMENT.md](../DEVELOPMENT.md)
+- [CONTRIBUTING.md](../CONTRIBUTING.md)
+- [SECURITY.md](../SECURITY.md)
+
+## Collaboration Surfaces
+- [Pull Request Template](../.github/pull_request_template.md)

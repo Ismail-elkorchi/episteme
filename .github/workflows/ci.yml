@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
+        with:
+          node-version: ${{ steps.toolversions.outputs.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Check CI
+        run: npm run check:ci
+
+  deno:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+          echo "deno=$(awk '/^deno /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
+        with:
+          node-version: ${{ steps.toolversions.outputs.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb
+        with:
+          deno-version: ${{ steps.toolversions.outputs.deno }}
+
+      - name: Deno checks
+        run: npm run check:deno
+
+      - name: Deno holdout
+        run: deno run --allow-read --node-modules-dir tests/holdout/xml-extractor.holdout.test.js
+
+  bun:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "bun=$(awk '/^bun /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@3d267786b128fe76c2f16a390aa2448b815359f3
+        with:
+          bun-version: ${{ steps.toolversions.outputs.bun }}
+
+      - name: Install
+        run: bun install
+
+      - name: Bun checks
+        run: npm run check:bun
+
+      - name: Bun holdout
+        run: bun tests/holdout/xml-extractor.holdout.test.js
