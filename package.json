@@ -50,5 +50,6 @@
     "fast-xml-parser": "^4.4.1",
     "linkedom": "^0.18.6",
     "pdfjs-dist": "^4.10.38"
-  }
+  },
+  "license": "MIT"
 }
