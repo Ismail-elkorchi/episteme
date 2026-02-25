@@ -39,7 +39,7 @@
     "test:html": "node tests/html-extractor.test.js",
     "test:html:golden": "node tests/html-golden.test.js",
     "test:pdf": "node tests/pdf-extractor.test.js",
-    "test": "npm run test:xml && npm run test:html-engine && npm run test:html && npm run test:html:golden && npm run test:pdf",
+    "test": "npm run prepare:parser-stack && npm run test:xml && npm run test:html-engine && npm run test:html && npm run test:html:golden && npm run test:pdf",
     "prepare:parser-stack": "node scripts/install/prepare-parser-stack-deps.mjs",
     "check": "npm run test",
     "check:holdout": "node tests/holdout/xml-extractor.holdout.test.js",
