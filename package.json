@@ -54,7 +54,7 @@
     "css-parser": "https://codeload.github.com/Ismail-elkorchi/css-parser/tar.gz/98b6c7bacf53a5b08032fd3b8959fc094a7a065c",
     "html-parser": "https://codeload.github.com/Ismail-elkorchi/html-parser/tar.gz/809a2c142cb12b85f6a713cb8d1189d6add472f2",
     "xml-parser": "https://codeload.github.com/Ismail-elkorchi/xml-parser/tar.gz/5047d0c2452c8ee0f4b303e9fc3bb4b4ef4d5f83",
-    "pdfjs-dist": "^4.10.38"
+    "pdfjs-dist": "^5.4.530"
   },
   "license": "MIT"
 }
