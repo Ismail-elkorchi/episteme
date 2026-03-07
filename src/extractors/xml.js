@@ -1,4 +1,4 @@
-import { parseXml } from "xml-parser";
+import { parseXml } from "@ismail-elkorchi/xml-parser";
 import { normalizeText } from "../utils.js";
 
 const XSD_SCHEMA_ATTRS = [

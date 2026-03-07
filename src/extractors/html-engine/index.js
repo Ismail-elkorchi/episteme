@@ -27,6 +27,7 @@ function normalizeEngineId(value) {
 function parserStackHtmlModuleSpecifiers() {
   return [
     readOptionalEnv(HTML_PARSER_SPECIFIER_ENV),
+    "@ismail-elkorchi/html-parser",
     "html-parser",
     new URL("../../../../html-parser/dist/mod.js", import.meta.url).href,
   ].filter(Boolean);
@@ -35,6 +36,7 @@ function parserStackHtmlModuleSpecifiers() {
 function parserStackCssModuleSpecifiers() {
   return [
     readOptionalEnv(CSS_PARSER_SPECIFIER_ENV),
+    "@ismail-elkorchi/css-parser",
     "css-parser",
     new URL("../../../../css-parser/dist/mod.js", import.meta.url).href,
   ].filter(Boolean);
