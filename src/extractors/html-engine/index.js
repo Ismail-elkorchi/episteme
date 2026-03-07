@@ -3,6 +3,7 @@ import { createParserStackHtmlEngine } from "./parser-stack.js";
 const DEFAULT_HTML_ENGINE = "parser-stack";
 const HTML_PARSER_SPECIFIER_ENV = "EPISTEME_HTML_PARSER_SPECIFIER";
 const CSS_PARSER_SPECIFIER_ENV = "EPISTEME_CSS_PARSER_SPECIFIER";
+const LOCAL_PARSER_REPO_FALLBACK_ENV = "EPISTEME_ALLOW_LOCAL_PARSER_REPO_FALLBACK";
 const PARSER_STACK_REMEDIATION_DOC = "docs/PARSER_STACK_REMEDIATION.md";
 
 function readOptionalEnv(name) {
@@ -24,22 +25,25 @@ function normalizeEngineId(value) {
   return DEFAULT_HTML_ENGINE;
 }
 
+function useLocalParserRepoFallback() {
+  const value = readOptionalEnv(LOCAL_PARSER_REPO_FALLBACK_ENV);
+  return value === "1" || value === "true";
+}
+
 function parserStackHtmlModuleSpecifiers() {
-  return [
-    readOptionalEnv(HTML_PARSER_SPECIFIER_ENV),
-    "@ismail-elkorchi/html-parser",
-    "html-parser",
-    new URL("../../../../html-parser/dist/mod.js", import.meta.url).href,
-  ].filter(Boolean);
+  const candidates = [readOptionalEnv(HTML_PARSER_SPECIFIER_ENV), "@ismail-elkorchi/html-parser"].filter(Boolean);
+  if (useLocalParserRepoFallback()) {
+    candidates.push(new URL("../../../../html-parser/dist/mod.js", import.meta.url).href);
+  }
+  return candidates;
 }
 
 function parserStackCssModuleSpecifiers() {
-  return [
-    readOptionalEnv(CSS_PARSER_SPECIFIER_ENV),
-    "@ismail-elkorchi/css-parser",
-    "css-parser",
-    new URL("../../../../css-parser/dist/mod.js", import.meta.url).href,
-  ].filter(Boolean);
+  const candidates = [readOptionalEnv(CSS_PARSER_SPECIFIER_ENV), "@ismail-elkorchi/css-parser"].filter(Boolean);
+  if (useLocalParserRepoFallback()) {
+    candidates.push(new URL("../../../../css-parser/dist/mod.js", import.meta.url).href);
+  }
+  return candidates;
 }
 
 async function importFromCandidates(label, candidates) {

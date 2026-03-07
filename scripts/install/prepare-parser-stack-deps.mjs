@@ -2,6 +2,8 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
+const LOCAL_SOURCE_BUILD_ENV = "EPISTEME_PREPARE_PARSER_STACK_FROM_SOURCE";
+
 const PACKAGES = [
   {
     label: "html-parser",
@@ -37,6 +39,11 @@ function distEntry(installDir) {
   return resolve(installDir, "dist", "mod.js");
 }
 
+function shouldBuildFromSource() {
+  const value = process.env[LOCAL_SOURCE_BUILD_ENV];
+  return value === "1" || value === "true";
+}
+
 function ensureBuilt({ label, packageName, installDir, skipPlaywrightDownload }) {
   const distPath = distEntry(installDir);
   if (existsSync(distPath)) {
@@ -46,6 +53,12 @@ function ensureBuilt({ label, packageName, installDir, skipPlaywrightDownload })
 
   if (!existsSync(installDir)) {
     throw new Error(`prepare:parser-stack missing dependency directory: ${installDir}`);
+  }
+
+  if (!shouldBuildFromSource()) {
+    throw new Error(
+      `prepare:parser-stack ${packageName} is installed without dist/mod.js. Reinstall with npm ci, or set ${LOCAL_SOURCE_BUILD_ENV}=1 when intentionally using a source checkout.`,
+    );
   }
 
   const env = {

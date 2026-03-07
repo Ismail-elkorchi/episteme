@@ -40,7 +40,7 @@ Consumers use only the CLI and published package interfaces.
 - Checklist outcome: refresh validated; XML Schema 1.1 source added; coverage map updated.
 
 ## XML/XSD Extractor
-- XML extractor uses xml-parser and produces XSD-aware sections.
+- XML extractor uses `@ismail-elkorchi/xml-parser` and produces XSD-aware sections.
 - Parser captures attributes, groups, schema metadata, annotations, facets, and model summaries.
 
 ## Verification
@@ -58,7 +58,7 @@ Consumers use only the CLI and published package interfaces.
 - Schema verification: schema diff against output examples; fragment field check (manual until automated).
 - Consumer surface verification: `npm pack --dry-run`, jsr exclude validation, and package:check failure on leaked paths.
 - Distribution verification: `npm pack --dry-run`, scoped install check, and CLI bin continuity (`episteme`).
-- Parser artifact preparation: `npm run prepare:parser-stack` (also executed by `check:ci`, `check:deno`, and `check:bun`).
+- Parser artifact preparation: `npm run prepare:parser-stack` verifies published parser artifacts and only builds source installs when `EPISTEME_PREPARE_PARSER_STACK_FROM_SOURCE=1` is set.
 
 ## Testing Fixtures
 - PREMIS XSD and W3C xml.xsd are baseline fixtures.
@@ -70,9 +70,9 @@ Consumers use only the CLI and published package interfaces.
 ## Runtime Parity
 - Mandate: remove Playwright and pdftotext to enable Node/Deno/Bun parity.
 - Non-goals: dynamic JS execution or headless browser rendering.
-- HTML extraction defaults to parser-stack (`html-parser` + `css-parser`).
+- HTML extraction defaults to parser-stack (`@ismail-elkorchi/html-parser` + `@ismail-elkorchi/css-parser`).
 - HTML extraction uses a single engine path (parser-stack only).
-- Episteme prepares parser-stack artifacts inside `node_modules` with `prepare:parser-stack` before runtime parity checks.
+- Episteme verifies parser-stack artifacts with `prepare:parser-stack` before runtime parity checks. Source builds are opt-in for local parser development only.
 - PDF extraction uses pdfjs-dist instead of pdftotext.
 - Deno/Bun test commands use --node-modules-dir.
 

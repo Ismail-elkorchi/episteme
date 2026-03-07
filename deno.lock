@@ -110,6 +110,9 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@ismail-elkorchi/css-parser@~0.1.1",
+        "npm:@ismail-elkorchi/html-parser@~0.1.1",
+        "npm:@ismail-elkorchi/xml-parser@~0.1.1",
         "npm:ajv@^8.18.0",
         "npm:pdfjs-dist@^4.10.38"
       ]
