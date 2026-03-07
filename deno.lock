@@ -1,8 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:ajv@^8.18.0": "8.18.0",
-    "npm:pdfjs-dist@^4.10.38": "4.10.38"
+    "npm:ajv@^8.18.0": "8.18.0"
   },
   "npm": {
     "@napi-rs/canvas-android-arm64@0.1.89": {
@@ -114,7 +113,7 @@
         "npm:@ismail-elkorchi/html-parser@~0.1.1",
         "npm:@ismail-elkorchi/xml-parser@~0.1.1",
         "npm:ajv@^8.18.0",
-        "npm:pdfjs-dist@^4.10.38"
+        "npm:pdfjs-dist@^5.4.624"
       ]
     }
   }

@@ -1,5 +1,48 @@
 import { extractTextDocument } from "./text.js";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+
+let pdfJsModulePromise;
+
+function ensurePdfJsCompatGlobals() {
+  if (typeof globalThis.DOMMatrix === "undefined") {
+    globalThis.DOMMatrix = class DOMMatrix {
+      constructor(init = []) {
+        this.init = init;
+      }
+
+      multiplySelf() {
+        return this;
+      }
+
+      preMultiplySelf() {
+        return this;
+      }
+
+      invertSelf() {
+        return this;
+      }
+
+      translate() {
+        return this;
+      }
+
+      scale() {
+        return this;
+      }
+    };
+  }
+
+  if (typeof globalThis.Path2D === "undefined") {
+    globalThis.Path2D = class Path2D {
+      addPath() {}
+    };
+  }
+}
+
+async function loadPdfJs() {
+  ensurePdfJsCompatGlobals();
+  pdfJsModulePromise ||= import("pdfjs-dist/legacy/build/pdf.mjs");
+  return pdfJsModulePromise;
+}
 
 function normalizePdfBytes(input) {
   if (!input) {
@@ -38,6 +81,7 @@ export async function extractPdfDocument({
 }) {
   try {
     const data = normalizePdfBytes(buffer);
+    const { getDocument } = await loadPdfJs();
     const loadingTask = getDocument({ data, disableWorker: true });
     const pdf = await loadingTask.promise;
     let text = "";
