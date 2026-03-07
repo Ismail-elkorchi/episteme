@@ -7,7 +7,7 @@ body:
     id: incident_id
     attributes:
       label: Incident ID
-      description: Stable identifier (example: INC-2026-02-24-001).
+      description: "Stable identifier (example: INC-2026-02-24-001)."
       placeholder: INC-YYYY-MM-DD-###
     validations:
       required: true

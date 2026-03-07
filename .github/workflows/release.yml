@@ -1,0 +1,190 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to validate release from"
+        required: true
+        default: main
+        type: string
+      dry_run:
+        description: "Run release preflight without publishing"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release-${{ github.event_name == 'push' && github.ref || inputs.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref_name || inputs.ref }}
+
+      - name: Read tool versions
+        id: toolversions
+        run: |
+          echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+          echo "deno=$(awk '/^deno /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+          echo "bun=$(awk '/^bun /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: ${{ steps.toolversions.outputs.node }}
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2
+        with:
+          deno-version: ${{ steps.toolversions.outputs.deno }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@3d267786b128fe76c2f16a390aa2448b815359f3 # v2
+        with:
+          bun-version: ${{ steps.toolversions.outputs.bun }}
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          package_name="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).name")"
+          package_version="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).version")"
+          jsr_version="$(node -p "JSON.parse(require('node:fs').readFileSync('jsr.json','utf8')).version")"
+
+          if [ "${package_version}" != "${jsr_version}" ]; then
+            echo "::error::Version mismatch: package.json=${package_version} jsr.json=${jsr_version}"
+            exit 1
+          fi
+
+          dry_run="true"
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            dry_run="false"
+            expected_version="${GITHUB_REF_NAME#v}"
+            if [ "${expected_version}" != "${package_version}" ]; then
+              echo "::error::Tag version mismatch: tag=${expected_version} package=${package_version}"
+              exit 1
+            fi
+          elif [ "${INPUT_DRY_RUN}" = "true" ]; then
+            dry_run="true"
+          else
+            echo "::error::workflow_dispatch supports preflight only; set dry_run=true"
+            exit 1
+          fi
+
+          {
+            echo "package_name=${package_name}"
+            echo "package_version=${package_version}"
+            echo "dry_run=${dry_run}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Install
+        run: npm ci
+
+      - name: Release gates
+        run: |
+          set -euo pipefail
+          npm run check:ci
+          npm run check:deno
+          npm run check:bun
+          npm pack --dry-run
+          npx -y jsr publish --dry-run --allow-dirty
+
+      - name: Ensure npm version does not already exist
+        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        env:
+          PACKAGE_NAME: ${{ steps.meta.outputs.package_name }}
+          VERSION: ${{ steps.meta.outputs.package_version }}
+        run: |
+          set -euo pipefail
+          set +e
+          npm_view_output="$(npm view "${PACKAGE_NAME}@${VERSION}" version 2>&1)"
+          npm_view_status=$?
+          set -e
+
+          if [ ${npm_view_status} -eq 0 ]; then
+            echo "::error::npm version already exists: ${PACKAGE_NAME}@${VERSION}"
+            echo "${npm_view_output}"
+            exit 1
+          fi
+
+          if printf '%s' "${npm_view_output}" | grep -Eqi 'E404|404 Not Found|not found'; then
+            echo "npm version does not exist yet: ${PACKAGE_NAME}@${VERSION}"
+          else
+            echo "::error::Unable to verify npm version state for ${PACKAGE_NAME}@${VERSION}"
+            echo "${npm_view_output}"
+            exit 1
+          fi
+
+      - name: Ensure JSR version does not already exist
+        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        env:
+          PACKAGE_NAME: ${{ steps.meta.outputs.package_name }}
+          VERSION: ${{ steps.meta.outputs.package_version }}
+        run: |
+          set -euo pipefail
+          set +e
+          jsr_info_output="$(npx -y jsr info "${PACKAGE_NAME}@${VERSION}" 2>&1)"
+          jsr_info_status=$?
+          set -e
+
+          if [ ${jsr_info_status} -eq 0 ]; then
+            echo "::error::JSR version already exists: ${PACKAGE_NAME}@${VERSION}"
+            echo "${jsr_info_output}"
+            exit 1
+          fi
+
+          if printf '%s' "${jsr_info_output}" | grep -Eqi '404|not found|Received 404'; then
+            echo "JSR version does not exist yet: ${PACKAGE_NAME}@${VERSION}"
+          else
+            echo "::error::Unable to verify JSR version state for ${PACKAGE_NAME}@${VERSION}"
+            echo "${jsr_info_output}"
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        if: ${{ github.event_name == 'push' }}
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          if gh release view "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release edit "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" --generate-notes
+          else
+            gh release create "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" --title "${TAG_NAME#v}" --generate-notes
+          fi
+
+      - name: Publish npm
+        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        env:
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          unset NODE_AUTH_TOKEN
+          npm config delete //registry.npmjs.org/:_authToken || true
+          npm publish --provenance --access public
+
+      - name: Publish JSR
+        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        run: npx -y jsr publish --allow-dirty

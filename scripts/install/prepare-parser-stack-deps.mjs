@@ -2,10 +2,27 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
+const LOCAL_SOURCE_BUILD_ENV = "EPISTEME_PREPARE_PARSER_STACK_FROM_SOURCE";
+
 const PACKAGES = [
-  { name: "html-parser", skipPlaywrightDownload: false },
-  { name: "css-parser", skipPlaywrightDownload: true },
-  { name: "xml-parser", skipPlaywrightDownload: false },
+  {
+    label: "html-parser",
+    packageName: "@ismail-elkorchi/html-parser",
+    installDir: resolve("node_modules", "@ismail-elkorchi", "html-parser"),
+    skipPlaywrightDownload: false,
+  },
+  {
+    label: "css-parser",
+    packageName: "@ismail-elkorchi/css-parser",
+    installDir: resolve("node_modules", "@ismail-elkorchi", "css-parser"),
+    skipPlaywrightDownload: true,
+  },
+  {
+    label: "xml-parser",
+    packageName: "@ismail-elkorchi/xml-parser",
+    installDir: resolve("node_modules", "@ismail-elkorchi", "xml-parser"),
+    skipPlaywrightDownload: false,
+  },
 ];
 
 function run(command, args, env) {
@@ -18,24 +35,30 @@ function run(command, args, env) {
   }
 }
 
-function packageDir(name) {
-  return resolve("node_modules", name);
+function distEntry(installDir) {
+  return resolve(installDir, "dist", "mod.js");
 }
 
-function distEntry(name) {
-  return resolve(packageDir(name), "dist", "mod.js");
+function shouldBuildFromSource() {
+  const value = process.env[LOCAL_SOURCE_BUILD_ENV];
+  return value === "1" || value === "true";
 }
 
-function ensureBuilt({ name, skipPlaywrightDownload }) {
-  const distPath = distEntry(name);
+function ensureBuilt({ label, packageName, installDir, skipPlaywrightDownload }) {
+  const distPath = distEntry(installDir);
   if (existsSync(distPath)) {
-    console.log(`prepare:parser-stack ${name} dist already present`);
+    console.log(`prepare:parser-stack ${label} dist already present`);
     return;
   }
 
-  const dir = packageDir(name);
-  if (!existsSync(dir)) {
-    throw new Error(`prepare:parser-stack missing dependency directory: ${dir}`);
+  if (!existsSync(installDir)) {
+    throw new Error(`prepare:parser-stack missing dependency directory: ${installDir}`);
+  }
+
+  if (!shouldBuildFromSource()) {
+    throw new Error(
+      `prepare:parser-stack ${packageName} is installed without dist/mod.js. Reinstall with npm ci, or set ${LOCAL_SOURCE_BUILD_ENV}=1 when intentionally using a source checkout.`,
+    );
   }
 
   const env = {
@@ -43,14 +66,14 @@ function ensureBuilt({ name, skipPlaywrightDownload }) {
     ...(skipPlaywrightDownload ? { PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1" } : {}),
   };
 
-  console.log(`prepare:parser-stack installing dev dependencies for ${name}`);
-  run("npm", ["--prefix", dir, "ci", "--include=dev", "--ignore-scripts"], env);
+  console.log(`prepare:parser-stack installing dev dependencies for ${packageName}`);
+  run("npm", ["--prefix", installDir, "ci", "--include=dev", "--ignore-scripts"], env);
 
-  console.log(`prepare:parser-stack building ${name}`);
-  run("npm", ["--prefix", dir, "run", "build"], env);
+  console.log(`prepare:parser-stack building ${packageName}`);
+  run("npm", ["--prefix", installDir, "run", "build"], env);
 
   if (!existsSync(distPath)) {
-    throw new Error(`prepare:parser-stack build completed but dist missing for ${name}: ${distPath}`);
+    throw new Error(`prepare:parser-stack build completed but dist missing for ${packageName}: ${distPath}`);
   }
 }
 
