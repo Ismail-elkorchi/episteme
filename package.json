@@ -54,7 +54,7 @@
     "@ismail-elkorchi/css-parser": "^0.1.1",
     "@ismail-elkorchi/html-parser": "^0.1.1",
     "@ismail-elkorchi/xml-parser": "^0.1.1",
-    "pdfjs-dist": "^5.4.624"
+    "pdfjs-dist": "^5.5.207"
   },
   "license": "MIT"
 }
