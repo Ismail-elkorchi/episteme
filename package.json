@@ -50,11 +50,11 @@
     "check:ci": "npm run prepare:parser-stack && npm run check && npm run check:holdout && npm run check:denylist && npm run package:check"
   },
   "dependencies": {
-    "ajv": "^8.18.0",
+    "ajv": "^8.20.0",
     "@ismail-elkorchi/css-parser": "^0.1.1",
     "@ismail-elkorchi/html-parser": "^0.1.1",
     "@ismail-elkorchi/xml-parser": "^0.1.1",
-    "pdfjs-dist": "^5.4.624"
+    "pdfjs-dist": "^5.6.205"
   },
   "license": "MIT"
 }
