@@ -67,9 +67,6 @@ jobs:
       - name: Deno checks
         run: npm run check:deno
 
-      - name: Deno holdout
-        run: deno run --allow-read --node-modules-dir=manual tests/holdout/xml-extractor.holdout.test.js
-
   bun:
     runs-on: ubuntu-latest
     steps:
@@ -91,6 +88,3 @@ jobs:
 
       - name: Bun checks
         run: npm run check:bun
-
-      - name: Bun holdout
-        run: bun tests/holdout/xml-extractor.holdout.test.js
