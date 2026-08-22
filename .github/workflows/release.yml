@@ -1,28 +1,22 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types:
+      - published
   workflow_dispatch:
     inputs:
       ref:
-        description: "Git ref to validate release from"
+        description: "Git ref to validate without publishing"
         required: true
         default: main
         type: string
-      dry_run:
-        description: "Run release preflight without publishing"
-        required: true
-        default: true
-        type: boolean
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
-  group: release-${{ github.event_name == 'push' && github.ref || inputs.ref }}
+  group: release-${{ github.event_name == 'release' && github.event.release.tag_name || inputs.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -30,15 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
-      contents: write
+      contents: read
       id-token: write
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Checkout
+      - name: Checkout the released ref
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || inputs.ref }}
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.ref }}
 
       - name: Read tool versions
         id: toolversions
@@ -64,92 +57,194 @@ jobs:
         with:
           bun-version: ${{ steps.toolversions.outputs.bun }}
 
-      - name: Resolve release metadata
+      - name: Resolve and verify release metadata
         id: meta
         env:
-          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           set -euo pipefail
 
-          package_name="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).name")"
-          package_version="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).version")"
+          npm_name="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).name")"
+          npm_version="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")"
+          jsr_name="$(node -p "JSON.parse(require('node:fs').readFileSync('jsr.json', 'utf8')).name")"
+          jsr_version="$(node -p "JSON.parse(require('node:fs').readFileSync('jsr.json', 'utf8')).version")"
+          runtime_version="$(node --input-type=module -e "import { EPISTEME_VERSION } from './src/constants.js'; process.stdout.write(EPISTEME_VERSION)")"
 
-          if [ "${package_name}" != "episteme" ]; then
-            echo "::error::Unexpected npm package name: ${package_name}"
+          if [ "${npm_name}" != "episteme" ]; then
+            echo "::error::Unexpected npm package name: ${npm_name}"
+            exit 1
+          fi
+          if [ "${jsr_name}" != "@ismail-elkorchi/episteme" ]; then
+            echo "::error::Unexpected JSR package name: ${jsr_name}"
+            exit 1
+          fi
+          if [ "${npm_version}" != "${jsr_version}" ] || [ "${npm_version}" != "${runtime_version}" ]; then
+            echo "::error::Version mismatch: npm=${npm_version} jsr=${jsr_version} runtime=${runtime_version}"
             exit 1
           fi
 
-          dry_run="true"
-          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
-            dry_run="false"
-            expected_version="${GITHUB_REF_NAME#v}"
-            if [ "${expected_version}" != "${package_version}" ]; then
-              echo "::error::Tag version mismatch: tag=${expected_version} package=${package_version}"
+          publish="false"
+          npm_tag="latest"
+          if [[ "${npm_version}" == *-* ]]; then
+            npm_tag="next"
+          fi
+
+          if [ "${GITHUB_EVENT_NAME}" = "release" ]; then
+            publish="true"
+            if [ "${RELEASE_TAG}" != "v${npm_version}" ]; then
+              echo "::error::Tag version mismatch: tag=${RELEASE_TAG} package=${npm_version}"
               exit 1
             fi
-          elif [ "${INPUT_DRY_RUN}" = "true" ]; then
-            dry_run="true"
-          else
-            echo "::error::workflow_dispatch supports preflight only; set dry_run=true"
-            exit 1
+            version_is_prerelease="false"
+            if [[ "${npm_version}" == *-* ]]; then
+              version_is_prerelease="true"
+            fi
+            if [ "${RELEASE_PRERELEASE}" != "${version_is_prerelease}" ]; then
+              echo "::error::GitHub pre-release state does not match semantic version ${npm_version}"
+              exit 1
+            fi
+            git fetch --no-tags origin main
+            if ! git merge-base --is-ancestor HEAD origin/main; then
+              echo "::error::Release commit is not contained in main"
+              exit 1
+            fi
           fi
 
           {
-            echo "package_name=${package_name}"
-            echo "package_version=${package_version}"
-            echo "dry_run=${dry_run}"
-          } >> "${GITHUB_OUTPUT}"
+            echo "npm_name=${npm_name}"
+            echo "jsr_name=${jsr_name}"
+            echo "version=${npm_version}"
+            echo "npm_tag=${npm_tag}"
+            echo "publish=${publish}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Verify npm bootstrap credential
+        if: ${{ steps.meta.outputs.publish == 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "::error::NPM_TOKEN is required until npm trusted publishing is configured"
+            exit 1
+          fi
 
       - name: Install
         run: npm ci
 
-      - name: Release gates
+      - name: Run release gates
         run: |
           set -euo pipefail
           npm run check:ci
           npm run check:deno
           npm run check:bun
+          npm run package:check:jsr
 
-      - name: Ensure npm version does not already exist
-        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+      - name: Inspect registry versions
+        id: registry
+        if: ${{ steps.meta.outputs.publish == 'true' }}
         env:
-          PACKAGE_NAME: ${{ steps.meta.outputs.package_name }}
-          VERSION: ${{ steps.meta.outputs.package_version }}
+          JSR_NAME: ${{ steps.meta.outputs.jsr_name }}
+          NPM_NAME: ${{ steps.meta.outputs.npm_name }}
+          VERSION: ${{ steps.meta.outputs.version }}
         run: |
           set -euo pipefail
+
           set +e
-          npm_view_output="$(npm view "${PACKAGE_NAME}@${VERSION}" version 2>&1)"
+          npm_view_output="$(npm view "${NPM_NAME}@${VERSION}" version 2>&1)"
           npm_view_status=$?
           set -e
-
+          npm_exists="false"
           if [ ${npm_view_status} -eq 0 ]; then
-            echo "::error::npm version already exists: ${PACKAGE_NAME}@${VERSION}"
+            npm_exists="true"
+          elif ! grep -Eqi 'E404|404 Not Found|not found' <<< "${npm_view_output}"; then
+            echo "::error::Unable to verify npm version state for ${NPM_NAME}@${VERSION}"
             echo "${npm_view_output}"
             exit 1
           fi
 
-          if printf '%s' "${npm_view_output}" | grep -Eqi 'E404|404 Not Found|not found'; then
-            echo "npm version does not exist yet: ${PACKAGE_NAME}@${VERSION}"
-          else
-            echo "::error::Unable to verify npm version state for ${PACKAGE_NAME}@${VERSION}"
-            echo "${npm_view_output}"
+          export JSR_META
+          JSR_META="$(curl --fail --silent --show-error "https://jsr.io/${JSR_NAME}/meta.json")"
+          jsr_exists="$(node -e '
+            const meta = JSON.parse(process.env.JSR_META);
+            const repository = meta.githubRepository || {};
+            if (repository.owner?.toLowerCase() !== "ismail-elkorchi" || repository.name !== "episteme") {
+              console.error("::error::JSR package is not linked to Ismail-elkorchi/episteme");
+              process.exit(1);
+            }
+            process.stdout.write(String(Object.hasOwn(meta.versions || {}, process.env.VERSION)));
+          ')"
+
+          if [ "${GITHUB_RUN_ATTEMPT}" = "1" ] && { [ "${npm_exists}" = "true" ] || [ "${jsr_exists}" = "true" ]; }; then
+            echo "::error::Version ${VERSION} already exists on npm or JSR"
             exit 1
           fi
 
-      - name: Create GitHub release
-        if: ${{ github.event_name == 'push' }}
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-        run: |
-          if gh release view "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            gh release edit "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" --generate-notes
-          else
-            gh release create "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" --title "${TAG_NAME#v}" --generate-notes
+          if [ "${GITHUB_RUN_ATTEMPT}" != "1" ] && [ "${npm_exists}" = "true" ]; then
+            npm_repository="$(npm view "${NPM_NAME}@${VERSION}" repository.url)"
+            if [ "${npm_repository}" != "git+https://github.com/Ismail-elkorchi/episteme.git" ]; then
+              echo "::error::Existing npm version does not identify this repository"
+              exit 1
+            fi
           fi
+
+          {
+            echo "npm_exists=${npm_exists}"
+            echo "jsr_exists=${jsr_exists}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Publish npm
-        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        if: ${{ steps.meta.outputs.publish == 'true' && steps.registry.outputs.npm_exists != 'true' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-        run: npm publish --provenance --access public
+          NPM_TAG: ${{ steps.meta.outputs.npm_tag }}
+        run: npm publish --access public --provenance --tag "${NPM_TAG}"
+
+      - name: Publish JSR
+        if: ${{ steps.meta.outputs.publish == 'true' && steps.registry.outputs.jsr_exists != 'true' }}
+        run: deno publish
+
+      - name: Verify published packages
+        if: ${{ steps.meta.outputs.publish == 'true' }}
+        env:
+          JSR_NAME: ${{ steps.meta.outputs.jsr_name }}
+          NPM_NAME: ${{ steps.meta.outputs.npm_name }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          for attempt in {1..12}; do
+            published_npm_version="$(npm view "${NPM_NAME}@${VERSION}" version 2>/dev/null || true)"
+            if [ "${published_npm_version}" = "${VERSION}" ]; then
+              break
+            fi
+            if [ "${attempt}" = "12" ]; then
+              echo "::error::npm did not return the published version"
+              exit 1
+            fi
+            sleep 5
+          done
+
+          for attempt in {1..12}; do
+            export JSR_META
+            JSR_META="$(curl --fail --silent --show-error --header 'Cache-Control: no-cache' "https://jsr.io/${JSR_NAME}/meta.json")"
+            if node -e '
+              const meta = JSON.parse(process.env.JSR_META);
+              process.exit(Object.hasOwn(meta.versions || {}, process.env.VERSION) ? 0 : 1);
+            '; then
+              break
+            fi
+            if [ "${attempt}" = "12" ]; then
+              echo "::error::JSR did not return the published version"
+              exit 1
+            fi
+            sleep 5
+          done
+
+          {
+            echo "### Published Episteme ${VERSION}"
+            echo
+            echo "- [npm](https://www.npmjs.com/package/${NPM_NAME}/v/${VERSION})"
+            echo "- [JSR](https://jsr.io/${JSR_NAME}@${VERSION})"
+            echo "- [GitHub Release](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/v${VERSION})"
+          } >> "$GITHUB_STEP_SUMMARY"

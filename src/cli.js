@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* @ts-self-types="./cli.d.ts" */
 import path from "node:path";
 import { parseInvocation, detectGlobalIntent, renderHelp } from "./cli-contract.js";
 import { ARTIFACT_SCHEMA_VERSION, EPISTEME_VERSION } from "./constants.js";

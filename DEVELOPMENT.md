@@ -70,6 +70,9 @@ npm run check:bun
 allowlist check. Deno and Bun validate portable modules; Node-only CLI subprocess tests are
 skipped on those runtimes.
 
+Run `npm run package:check:jsr -- --allow-dirty` while preparing a JSR packaging change. The
+release workflow runs the same dry-run from a clean tag checkout without `--allow-dirty`.
+
 ## Dependencies
 
 Dependency updates are curated. Review `npm outdated`, update related parser packages together
@@ -77,16 +80,24 @@ when their APIs change, regenerate `package-lock.json`, and run all verification
 
 ## Releases
 
-The sole package target is the public npm package `episteme`. To release:
+Every version is published as unscoped `episteme` on npm and scoped
+`@ismail-elkorchi/episteme` on JSR. A published GitHub Release is the sole deployment trigger.
 
-1. Update `package.json`, `package-lock.json`, and `src/constants.js` to the same version.
-2. Merge with all release gates passing.
-3. Push the matching `v<version>` tag.
+To release:
 
-The release workflow verifies package boundaries and versions, publishes with provenance, and
-creates the GitHub release.
+1. Update `package.json`, `package-lock.json`, `jsr.json`, and `src/constants.js` to the same
+   semantic version in a pull request.
+2. Merge the pull request with all required checks passing.
+3. Create `v<version>` from that commit as a GitHub Release and generate its release notes.
 
-The first release claims the unscoped package name and therefore needs a short-lived, granular
-npm automation token in the `NPM_TOKEN` repository secret. After that release, configure
-`Ismail-elkorchi/episteme` and `.github/workflows/release.yml` as the package's npm trusted
-publisher, delete the bootstrap secret, and disallow token-based publishing.
+The release workflow checks that the tag, npm package, JSR package, runtime, and GitHub
+pre-release state agree. It accepts only release commits contained in `main`, reruns every gate,
+performs both registry dry-runs, rejects an existing version, publishes npm with provenance,
+and publishes JSR through the linked repository's short-lived OIDC identity. Manual workflow
+dispatch is preflight-only and cannot publish.
+
+The first npm release uses the short-lived, granular `NPM_TOKEN` repository secret. Once the
+package exists, configure `Ismail-elkorchi/episteme` and `release.yml` as its npm trusted
+publisher. Then update the workflow to remove the bootstrap credential, verify the next release
+through OIDC, remove the repository secret, and disallow token publishing. JSR requires no secret
+because the package is linked to this GitHub repository.
