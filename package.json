@@ -44,18 +44,21 @@
     "test:coverage": "npm run prepare:parser-stack && node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-lines=70 --test-coverage-functions=70 --test-coverage-branches=60",
     "prepare:parser-stack": "node scripts/install/prepare-parser-stack-deps.mjs",
     "check": "npm run test:coverage",
+    "check:audit": "npm audit --audit-level=high",
     "check:denylist": "node scripts/security/check-denylist.mjs",
     "check:deno": "npm run prepare:parser-stack && deno test --no-check --allow-read --allow-write --allow-net --allow-env --node-modules-dir=manual tests",
     "check:bun": "npm run prepare:parser-stack && bun test tests",
     "package:check": "node scripts/verify-package.mjs",
-    "check:ci": "npm run check && npm run check:denylist && npm run package:check"
+    "check:ci": "npm run check && npm run check:audit && npm run check:denylist && npm run package:check"
   },
   "dependencies": {
-    "ajv": "^8.18.0",
-    "@ismail-elkorchi/css-parser": "^0.1.1",
-    "@ismail-elkorchi/html-parser": "^0.1.1",
-    "@ismail-elkorchi/xml-parser": "^0.1.1",
-    "pdfjs-dist": "^5.4.624"
+    "@ismail-elkorchi/css-parser": "^0.2.0",
+    "@ismail-elkorchi/html-parser": "^0.2.1",
+    "@ismail-elkorchi/xml-parser": "^0.2.0",
+    "pdfjs-dist": "^6.2.108"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ajv": "^8.20.0"
+  }
 }
