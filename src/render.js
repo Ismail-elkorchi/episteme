@@ -1,7 +1,3 @@
-export function renderJson(document) {
-  return JSON.stringify(document, null, 2) + "\n";
-}
-
 export function renderMarkdown(document) {
   const lines = [];
   lines.push(`# ${document.title}`);
