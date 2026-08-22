@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import test from "node:test";
 import { extractHtmlDocument } from "../src/extractors/html.js";
 import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { assertSchema } from "./helpers/schema-validator.js";
@@ -8,7 +9,7 @@ async function buildDom(html, url) {
   return engine.parse({ html, url });
 }
 
-async function testHtmlExtraction() {
+test("extracts a structured HTML document", async () => {
   const html = `<!doctype html>
 <html>
 <head><title>Test Doc</title></head>
@@ -42,14 +43,4 @@ async function testHtmlExtraction() {
   assert.equal(first.heading, "Introduction");
   const textBlocks = first.blocks.filter((block) => block.type === "paragraph");
   assert.ok(textBlocks.some((block) => block.text.includes("First paragraph")));
-}
-
-async function run() {
-  await testHtmlExtraction();
-  console.log("html-extractor tests passed");
-}
-
-run().catch((error) => {
-  console.error("html-extractor tests failed", error);
-  process.exit(1);
 });

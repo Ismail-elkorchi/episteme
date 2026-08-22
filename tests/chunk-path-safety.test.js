@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import test from "node:test";
 import { chunkAll } from "../src/pipeline/chunk.js";
 
-async function testExtractedIdsCannotControlOutputPaths() {
+test("extracted IDs cannot control output paths", async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-chunk-path-"));
   const inputDir = path.join(root, "input");
   const outDir = path.join(root, "out");
@@ -54,14 +55,4 @@ async function testExtractedIdsCannotControlOutputPaths() {
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }
-}
-
-async function run() {
-  await testExtractedIdsCannotControlOutputPaths();
-  console.log("chunk path safety tests passed");
-}
-
-run().catch((error) => {
-  console.error("chunk path safety tests failed", error);
-  process.exit(1);
 });
