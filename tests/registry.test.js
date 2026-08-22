@@ -17,5 +17,8 @@ test("resolves explicit, detected, and generic families", async () => {
   assert.equal(resolveFamily(plugins, "https://example.test", "rfc").id, "rfc");
   assert.equal(resolveFamily(plugins, "https://www.w3.org/TR/example").id, "w3c");
   assert.equal(resolveFamily(plugins, "https://example.test/document").id, "generic");
-  assert.equal(resolveFamily(plugins, "https://example.test", "missing").id, "generic");
+  assert.throws(
+    () => resolveFamily(plugins, "https://example.test", "missing"),
+    /Unknown extraction family/u,
+  );
 });

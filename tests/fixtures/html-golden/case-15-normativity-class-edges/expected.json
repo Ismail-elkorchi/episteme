@@ -1,74 +1,93 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-15-normativity-class-edges",
-  "title": "Case 15",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-15-normativity-class-edges",
-  "source": {
-    "fixtureId": "case-15-normativity-class-edges"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "d9815c7335251be7229c1534b0b1cc4a9ba40ee92428532846a3eb82d7d5e86b"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "norms",
-      "heading": "Normativity",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "normative",
           "source": {
-            "url": "https://example.test/case-15-normativity-class-edges",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-15-normativity-class-edges"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Normative paragraph."
+          "text": "Normative paragraph.",
+          "type": "paragraph"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "example",
           "source": {
-            "url": "https://example.test/case-15-normativity-class-edges",
             "fragment": null,
-            "path": "div:nth-of-type(1) > p:nth-of-type(1)"
+            "path": "div:nth-of-type(1) > p:nth-of-type(1)",
+            "url": "https://example.test/case-15-normativity-class-edges"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Example inside normative."
+          "text": "Example inside normative.",
+          "type": "paragraph"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-15-normativity-class-edges",
             "fragment": null,
-            "path": "div:nth-of-type(2) > p:nth-of-type(1)"
+            "path": "div:nth-of-type(2) > p:nth-of-type(1)",
+            "url": "https://example.test/case-15-normativity-class-edges"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Informative by ancestor."
+          "text": "Informative by ancestor.",
+          "type": "paragraph"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "example",
           "source": {
-            "url": "https://example.test/case-15-normativity-class-edges",
             "fragment": null,
-            "path": "p:nth-of-type(2)"
+            "path": "p:nth-of-type(2)",
+            "url": "https://example.test/case-15-normativity-class-edges"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Example then informative."
+          "text": "Example then informative.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Normativity",
+      "id": "norms",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-15-normativity-class-edges#norms",
         "fragment": "norms",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-15-normativity-class-edges#norms"
       }
     }
-  ]
+  ],
+  "snapshotId": "a049fb0cf2fd994802e6497a6798f8b113a692814ab6069b96e9e82f187b3f27",
+  "source": {
+    "bytes": 388,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-15-normativity-class-edges",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "d9815c7335251be7229c1534b0b1cc4a9ba40ee92428532846a3eb82d7d5e86b",
+    "snapshotId": "a049fb0cf2fd994802e6497a6798f8b113a692814ab6069b96e9e82f187b3f27",
+    "sourceUrl": "https://example.test/case-15-normativity-class-edges"
+  },
+  "title": "Case 15",
+  "url": "https://example.test/case-15-normativity-class-edges"
 }

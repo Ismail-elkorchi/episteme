@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { extractXmlDocument } from "../src/extractors/xml.js";
 import { assertSchema } from "./helpers/schema-validator.js";
+import { extractionFixture } from "./helpers/extraction-fixture.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,16 +37,30 @@ function findDefinition(items, predicate) {
   return items.find((item) => predicate(item.term || "", item.definition || ""));
 }
 
+function xmlContext(url, text, family, authority) {
+  return extractionFixture({
+    url,
+    content: text,
+    contentType: "application/xml; charset=utf-8",
+    extractor: "xml",
+    family,
+    authority,
+    documentType: "xsd",
+  });
+}
+
 test("extracts PREMIS enumeration facets", async () => {
   const xmlText = await loadFixtureText(
     "https://www.loc.gov/standards/premis/v3/premis-v3-0.xsd",
   );
+  const url = "https://www.loc.gov/standards/premis/v3/premis-v3-0.xsd";
   const doc = extractXmlDocument({
     text: xmlText,
-    url: "https://www.loc.gov/standards/premis/v3/premis-v3-0.xsd",
+    url,
     family: "premis",
     authority: "normative",
     documentType: "xsd",
+    ...xmlContext(url, xmlText, "premis", "normative"),
   });
   await assertSchema(doc, "premis-xsd");
 
@@ -64,12 +79,14 @@ test("extracts PREMIS enumeration facets", async () => {
 
 test("extracts XML namespace enumeration facets", async () => {
   const xmlText = await loadFixtureText("https://www.w3.org/2001/xml.xsd");
+  const url = "https://www.w3.org/2001/xml.xsd";
   const doc = extractXmlDocument({
     text: xmlText,
-    url: "https://www.w3.org/2001/xml.xsd",
+    url,
     family: "w3c",
     authority: "normative",
     documentType: "xsd",
+    ...xmlContext(url, xmlText, "w3c", "normative"),
   });
   await assertSchema(doc, "xml-xsd");
 
@@ -105,12 +122,14 @@ test("extracts synthetic XSD 1.1 assertions", async () => {
   </xs:simpleType>
 </xs:schema>`;
 
+  const url = "https://example.test/synthetic.xsd";
   const doc = extractXmlDocument({
     text: synthetic,
-    url: "https://example.test/synthetic.xsd",
+    url,
     family: "synthetic",
     authority: "informative",
     documentType: "xsd",
+    ...xmlContext(url, synthetic, "synthetic", "informative"),
   });
   await assertSchema(doc, "synthetic-xsd");
 

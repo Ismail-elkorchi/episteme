@@ -1,29 +1,41 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import Ajv from "ajv";
+import Ajv2020 from "ajv/dist/2020.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const schemaPath = path.join(__dirname, "..", "..", "schema", "document.schema.json");
+const schemaDir = path.join(__dirname, "..", "..", "schema");
+const validators = new Map();
 
-let cachedValidator = null;
-
-async function loadValidator() {
-  if (cachedValidator) {
-    return cachedValidator;
+async function loadValidator(schemaFile) {
+  if (validators.has(schemaFile)) {
+    return validators.get(schemaFile);
   }
-  const raw = await fs.readFile(schemaPath, "utf8");
+  const raw = await fs.readFile(path.join(schemaDir, schemaFile), "utf8");
   const schema = JSON.parse(raw);
-  const ajv = new Ajv({ allErrors: true, strict: false });
+  const ajv = new Ajv2020({ allErrors: true, strict: false, validateFormats: false });
   const validate = ajv.compile(schema);
-  cachedValidator = { ajv, validate };
-  return cachedValidator;
+  const validator = { ajv, validate };
+  validators.set(schemaFile, validator);
+  return validator;
 }
 
 export async function assertSchema(doc, label = "document") {
-  const { ajv, validate } = await loadValidator();
-  const valid = validate(doc);
+  return assertAgainstSchema(doc, "document.schema.json", label);
+}
+
+export async function assertCliEnvelope(envelope, label = "CLI envelope") {
+  return assertAgainstSchema(envelope, "cli-envelope.schema.json", label);
+}
+
+export async function assertArtifact(artifact, label = "artifact") {
+  return assertAgainstSchema(artifact, "artifact.schema.json", label);
+}
+
+async function assertAgainstSchema(value, schemaFile, label) {
+  const { ajv, validate } = await loadValidator(schemaFile);
+  const valid = validate(value);
   if (!valid) {
     const details = ajv.errorsText(validate.errors, { separator: " | " });
     throw new Error(`Schema validation failed for ${label}: ${details}`);

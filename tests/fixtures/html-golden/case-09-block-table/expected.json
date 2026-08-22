@@ -1,34 +1,27 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-09-block-table",
-  "title": "Case 09",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-09-block-table",
-  "source": {
-    "fixtureId": "case-09-block-table"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "dbbaa0f872d685e1f0ef9bdf38f4496ff1209b8ea90b4e548167acfb1fd79ab6"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "table",
-      "heading": "Table",
-      "level": 1,
       "blocks": [
         {
-          "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-09-block-table",
-            "fragment": null,
-            "path": "table:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "table",
           "headers": [
             "Name",
             "Value"
           ],
+          "id": null,
+          "links": [],
+          "normativity": "informative",
           "rows": [
             [
               "A",
@@ -38,14 +31,40 @@
               "B",
               "2"
             ]
-          ]
+          ],
+          "source": {
+            "fragment": null,
+            "path": "table:nth-of-type(1)",
+            "url": "https://example.test/case-09-block-table"
+          },
+          "type": "table"
         }
       ],
+      "heading": "Table",
+      "id": "table",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-09-block-table#table",
         "fragment": "table",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-09-block-table#table"
       }
     }
-  ]
+  ],
+  "snapshotId": "bea5b3d13184014126966fad678bfabe99140a6e3cdae677f006863c61e12dc9",
+  "source": {
+    "bytes": 322,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-09-block-table",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "dbbaa0f872d685e1f0ef9bdf38f4496ff1209b8ea90b4e548167acfb1fd79ab6",
+    "snapshotId": "bea5b3d13184014126966fad678bfabe99140a6e3cdae677f006863c61e12dc9",
+    "sourceUrl": "https://example.test/case-09-block-table"
+  },
+  "title": "Case 09",
+  "url": "https://example.test/case-09-block-table"
 }

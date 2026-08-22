@@ -1,58 +1,77 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-08-block-ul-ol",
-  "title": "Case 08",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-08-block-ul-ol",
-  "source": {
-    "fixtureId": "case-08-block-ul-ol"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "3ecf5809ab80206993edd943ff462485bf04c89291df4c6dda50e0b621a6c86f"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "lists",
-      "heading": "Lists",
-      "level": 1,
       "blocks": [
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-08-block-ul-ol",
-            "fragment": null,
-            "path": "ul:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "list",
-          "ordered": false,
           "items": [
             "Alpha",
             "Beta"
-          ]
+          ],
+          "links": [],
+          "normativity": "informative",
+          "ordered": false,
+          "source": {
+            "fragment": null,
+            "path": "ul:nth-of-type(1)",
+            "url": "https://example.test/case-08-block-ul-ol"
+          },
+          "type": "list"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-08-block-ul-ol",
-            "fragment": null,
-            "path": "ol:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "list",
-          "ordered": true,
           "items": [
             "One",
             "Two"
-          ]
+          ],
+          "links": [],
+          "normativity": "informative",
+          "ordered": true,
+          "source": {
+            "fragment": null,
+            "path": "ol:nth-of-type(1)",
+            "url": "https://example.test/case-08-block-ul-ol"
+          },
+          "type": "list"
         }
       ],
+      "heading": "Lists",
+      "id": "lists",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-08-block-ul-ol#lists",
         "fragment": "lists",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-08-block-ul-ol#lists"
       }
     }
-  ]
+  ],
+  "snapshotId": "c87e02b8ff631a258a14a9e5d6b9e910c6945e8aa6e9e209aabc7bb455a13c6a",
+  "source": {
+    "bytes": 235,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-08-block-ul-ol",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "3ecf5809ab80206993edd943ff462485bf04c89291df4c6dda50e0b621a6c86f",
+    "snapshotId": "c87e02b8ff631a258a14a9e5d6b9e910c6945e8aa6e9e209aabc7bb455a13c6a",
+    "sourceUrl": "https://example.test/case-08-block-ul-ol"
+  },
+  "title": "Case 08",
+  "url": "https://example.test/case-08-block-ul-ol"
 }

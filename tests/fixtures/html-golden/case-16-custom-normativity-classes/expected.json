@@ -1,62 +1,81 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-16-custom-normativity-classes",
-  "title": "Case 16",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-16-custom-normativity-classes",
-  "source": {
-    "fixtureId": "case-16-custom-normativity-classes"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "ca9b9e6e875c8c4567e32aace6a0e7e5c746e3098015b36334e5ed913d897cf8",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "3cbda015371bf46124d860590baabceeefcb46205c49f25359304511c5654c00"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "custom",
-      "heading": "Custom Classes",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-16-custom-normativity-classes",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-16-custom-normativity-classes"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Hint paragraph."
+          "text": "Hint paragraph.",
+          "type": "paragraph"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "example",
           "source": {
-            "url": "https://example.test/case-16-custom-normativity-classes",
             "fragment": null,
-            "path": "p:nth-of-type(2)"
+            "path": "p:nth-of-type(2)",
+            "url": "https://example.test/case-16-custom-normativity-classes"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Demo paragraph."
+          "text": "Demo paragraph.",
+          "type": "paragraph"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "normative",
           "source": {
-            "url": "https://example.test/case-16-custom-normativity-classes",
             "fragment": null,
-            "path": "p:nth-of-type(3)"
+            "path": "p:nth-of-type(3)",
+            "url": "https://example.test/case-16-custom-normativity-classes"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Must paragraph."
+          "text": "Must paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Custom Classes",
+      "id": "custom",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-16-custom-normativity-classes#custom",
         "fragment": "custom",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-16-custom-normativity-classes#custom"
       }
     }
-  ]
+  ],
+  "snapshotId": "7adcb4792587e027a2493f99b5fa3ce477da49265929d4bb75a0d91de95d3693",
+  "source": {
+    "bytes": 248,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-16-custom-normativity-classes",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "3cbda015371bf46124d860590baabceeefcb46205c49f25359304511c5654c00",
+    "snapshotId": "7adcb4792587e027a2493f99b5fa3ce477da49265929d4bb75a0d91de95d3693",
+    "sourceUrl": "https://example.test/case-16-custom-normativity-classes"
+  },
+  "title": "Case 16",
+  "url": "https://example.test/case-16-custom-normativity-classes"
 }

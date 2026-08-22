@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { writeFileAtomic } from "./execution.js";
 
 export function sha256Hex(buffer) {
   const hash = createHash("sha256");
@@ -8,7 +9,26 @@ export function sha256Hex(buffer) {
   return hash.digest("hex");
 }
 
-export async function ensureDir(filePath) {
+export function canonicalJson(value) {
+  return JSON.stringify(sortJsonValue(value));
+}
+
+export function fingerprintJson(value) {
+  return sha256Hex(Buffer.from(canonicalJson(value), "utf8"));
+}
+
+export function withFingerprint(artifact) {
+  const { fingerprint: _ignored, ...content } = artifact;
+  return { ...content, fingerprint: fingerprintJson(content) };
+}
+
+export function hasValidFingerprint(artifact) {
+  if (!artifact || typeof artifact.fingerprint !== "string") return false;
+  const { fingerprint, ...content } = artifact;
+  return fingerprintJson(content) === fingerprint;
+}
+
+async function ensureDir(filePath) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
 }
 
@@ -26,25 +46,18 @@ export async function readJson(filePath, fallback = null) {
 
 export async function writeJson(filePath, data) {
   await ensureDir(filePath);
-  const payload = JSON.stringify(data, null, 2) + "\n";
-  await fs.writeFile(filePath, payload, "utf8");
+  const payload = JSON.stringify(sortJsonValue(data), null, 2) + "\n";
+  await writeFileAtomic(filePath, payload, "utf8");
+  return {
+    bytes: Buffer.byteLength(payload, "utf8"),
+    sha256: sha256Hex(Buffer.from(payload, "utf8")),
+  };
 }
 
 export function normalizeUrlForSnapshot(urlString) {
   const url = new URL(urlString);
   url.hash = "";
   return url.toString();
-}
-
-export function sanitizeUrlToId(urlString) {
-  const url = new URL(urlString);
-  const raw = `${url.hostname}${url.pathname}${url.search}${url.hash}`;
-  return raw
-    .replace(/\/+$/g, "")
-    .replace(/[^a-zA-Z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .toLowerCase();
 }
 
 export function extractFragment(urlString) {
@@ -69,11 +82,18 @@ export function nowIso() {
   return new Date().toISOString();
 }
 
-export function stableSectionKey(section, index) {
-  if (section.id) {
-    return section.id.replace(/\s+/g, "-");
+function sortJsonValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(sortJsonValue);
   }
-  return `section-${index + 1}`;
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, sortJsonValue(value[key])]),
+    );
+  }
+  return value;
 }
 
 export function normalizeText(text) {

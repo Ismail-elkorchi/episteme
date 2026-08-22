@@ -1,31 +1,28 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/algorithm-grammar",
-  "title": "Algorithm Grammar",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-algorithm-grammar",
-  "source": {
-    "fixtureId": "algorithm-grammar"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "0cebca76db470097417e8067cf94533dc80e97cff8a4a34eca9516371235dae4",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "4e489653c0c4a7099de22afbff471a97992cff626255f81d4916cd228d4a0d31"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "alg",
-      "heading": "Algorithms",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/algorithm-grammar",
             "fragment": null,
-            "path": "div:nth-of-type(1) > ol:nth-of-type(1)"
+            "path": "div:nth-of-type(1) > ol:nth-of-type(1)",
+            "url": "https://example.test/algorithm-grammar"
           },
-          "links": [],
-          "type": "algorithm",
-          "title": "Algorithms",
           "steps": [
             {
               "stepId": "1",
@@ -35,39 +32,35 @@
               "stepId": "2",
               "text": "Return result"
             }
-          ]
+          ],
+          "title": "Algorithms",
+          "type": "algorithm"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/algorithm-grammar",
-            "fragment": null,
-            "path": "pre:nth-of-type(1)"
-          },
           "links": [],
-          "type": "grammar",
+          "normativity": "informative",
           "productions": [
             {
               "lhs": "Expr",
               "rhs": "Term (\"+\" Term)*"
             }
-          ]
+          ],
+          "source": {
+            "fragment": null,
+            "path": "pre:nth-of-type(1)",
+            "url": "https://example.test/algorithm-grammar"
+          },
+          "type": "grammar"
         },
         {
-          "id": "tbl",
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/algorithm-grammar#tbl",
-            "fragment": "tbl",
-            "path": "table:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "table",
           "headers": [
             "Name",
             "Value"
           ],
+          "id": "tbl",
+          "links": [],
+          "normativity": "informative",
           "rows": [
             [
               "A",
@@ -77,14 +70,40 @@
               "B",
               "2"
             ]
-          ]
+          ],
+          "source": {
+            "fragment": "tbl",
+            "path": "table:nth-of-type(1)",
+            "url": "https://example.test/algorithm-grammar#tbl"
+          },
+          "type": "table"
         }
       ],
+      "heading": "Algorithms",
+      "id": "alg",
+      "level": 1,
       "source": {
-        "url": "https://example.test/algorithm-grammar#alg",
         "fragment": "alg",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/algorithm-grammar#alg"
       }
     }
-  ]
+  ],
+  "snapshotId": "9c889f2ada0d064bc6f3da43ea65793f0008abf003ed040985ac39afba089e18",
+  "source": {
+    "bytes": 476,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/algorithm-grammar",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "4e489653c0c4a7099de22afbff471a97992cff626255f81d4916cd228d4a0d31",
+    "snapshotId": "9c889f2ada0d064bc6f3da43ea65793f0008abf003ed040985ac39afba089e18",
+    "sourceUrl": "https://example.test/algorithm-grammar"
+  },
+  "title": "Algorithm Grammar",
+  "url": "https://example.test/algorithm-grammar"
 }

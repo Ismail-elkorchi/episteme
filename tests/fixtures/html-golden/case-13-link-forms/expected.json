@@ -1,59 +1,78 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-13-link-forms",
-  "title": "Case 13",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-13-link-forms",
-  "source": {
-    "fixtureId": "case-13-link-forms"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "53d14df2d2f3ce90a88c9b351f185eba99d294965edee7de0569e0428dcb55f3"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "links",
-      "heading": "Links",
-      "level": 1,
       "blocks": [
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-13-link-forms",
-            "fragment": null,
-            "path": "p:nth-of-type(1)"
-          },
           "links": [
             {
-              "text": "absolute",
               "href": "https://example.org/path",
-              "resolvedId": null
+              "resolvedId": null,
+              "text": "absolute"
             },
             {
-              "text": "relative",
               "href": "/relative/path",
-              "resolvedId": null
+              "resolvedId": null,
+              "text": "relative"
             },
             {
-              "text": "fragment",
               "href": "#local-fragment",
-              "resolvedId": "local-fragment"
+              "resolvedId": "local-fragment",
+              "text": "fragment"
             },
             {
-              "text": "mail",
               "href": "mailto:dev@example.test",
-              "resolvedId": null
+              "resolvedId": null,
+              "text": "mail"
             }
           ],
-          "type": "paragraph",
-          "text": "absolute relative fragment mail"
+          "normativity": "informative",
+          "source": {
+            "fragment": null,
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-13-link-forms"
+          },
+          "text": "absolute relative fragment mail",
+          "type": "paragraph"
         }
       ],
+      "heading": "Links",
+      "id": "links",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-13-link-forms#links",
         "fragment": "links",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-13-link-forms#links"
       }
     }
-  ]
+  ],
+  "snapshotId": "e516e789c8750d792cec88ed716077d1529c089f64020f8d3e77914d8fdaec5e",
+  "source": {
+    "bytes": 327,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-13-link-forms",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "53d14df2d2f3ce90a88c9b351f185eba99d294965edee7de0569e0428dcb55f3",
+    "snapshotId": "e516e789c8750d792cec88ed716077d1529c089f64020f8d3e77914d8fdaec5e",
+    "sourceUrl": "https://example.test/case-13-link-forms"
+  },
+  "title": "Case 13",
+  "url": "https://example.test/case-13-link-forms"
 }

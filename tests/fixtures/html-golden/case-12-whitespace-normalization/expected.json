@@ -1,54 +1,73 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-12-whitespace-normalization",
-  "title": "Case 12",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-12-whitespace-normalization",
-  "source": {
-    "fixtureId": "case-12-whitespace-normalization"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "d291e402331ead81fb238738b71ac05ccc55d3aaa4bdbf6f1b6cc7c17a9fdd18"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "space",
-      "heading": "Space\\n Heading",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-12-whitespace-normalization",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-12-whitespace-normalization"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "First line\\n\\nSecond\\tline."
+          "text": "First line\\n\\nSecond\\tline.",
+          "type": "paragraph"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-12-whitespace-normalization",
-            "fragment": null,
-            "path": "ul:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "list",
-          "ordered": false,
           "items": [
             "Item One",
             "Item\\nTwo"
-          ]
+          ],
+          "links": [],
+          "normativity": "informative",
+          "ordered": false,
+          "source": {
+            "fragment": null,
+            "path": "ul:nth-of-type(1)",
+            "url": "https://example.test/case-12-whitespace-normalization"
+          },
+          "type": "list"
         }
       ],
+      "heading": "Space\\n Heading",
+      "id": "space",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-12-whitespace-normalization#space",
         "fragment": "space",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-12-whitespace-normalization#space"
       }
     }
-  ]
+  ],
+  "snapshotId": "0685994dff29ab6c88b4ca4dd23884063f5d81cb10c71ca70ded1642d369d894",
+  "source": {
+    "bytes": 255,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-12-whitespace-normalization",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "d291e402331ead81fb238738b71ac05ccc55d3aaa4bdbf6f1b6cc7c17a9fdd18",
+    "snapshotId": "0685994dff29ab6c88b4ca4dd23884063f5d81cb10c71ca70ded1642d369d894",
+    "sourceUrl": "https://example.test/case-12-whitespace-normalization"
+  },
+  "title": "Case 12",
+  "url": "https://example.test/case-12-whitespace-normalization"
 }

@@ -1,25 +1,44 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/edge-prune-body",
-  "title": "Pruned Body",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-edge-prune-body",
-  "source": {
-    "fixtureId": "edge-prune-body"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "f41653d3ac8e87cde6442d15e0c366247fd27596952aa66bd01ec0fbf5e487a1",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "841099ec0af5c988b3e76c55b361a69529f416bc9aff1c578d1ba491a4cfe919"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": null,
-      "heading": "Pruned Body",
-      "level": 1,
       "blocks": [],
+      "heading": "Pruned Body",
+      "id": null,
+      "level": 1,
       "source": {
-        "url": "https://example.test/edge-prune-body",
         "fragment": null,
-        "path": ""
+        "path": "",
+        "url": "https://example.test/edge-prune-body"
       }
     }
-  ]
+  ],
+  "snapshotId": "b37cd3fa5f106e7e5881feaccc979a2b98033fc31b839f79d494fe2e9f0f835c",
+  "source": {
+    "bytes": 138,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/edge-prune-body",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "841099ec0af5c988b3e76c55b361a69529f416bc9aff1c578d1ba491a4cfe919",
+    "snapshotId": "b37cd3fa5f106e7e5881feaccc979a2b98033fc31b839f79d494fe2e9f0f835c",
+    "sourceUrl": "https://example.test/edge-prune-body"
+  },
+  "title": "Pruned Body",
+  "url": "https://example.test/edge-prune-body"
 }

@@ -1,50 +1,69 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-14-source-path-fragment",
-  "title": "Case 14",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-14-source-path-fragment",
-  "source": {
-    "fixtureId": "case-14-source-path-fragment"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "55860acc4f8b6b1a1af6bea6aa48da60ce0b575c86d77467baca67b1e833ca16",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "9fe1e4efae0c4f50ace5060f3b90d54bec62a0626ee7d040ca3848c22f12442a"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "sec-14",
-      "heading": "Path Source",
-      "level": 2,
       "blocks": [
         {
           "id": "para-id",
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-14-source-path-fragment#para-id",
             "fragment": "para-id",
-            "path": "main:nth-of-type(1) > p:nth-of-type(1)"
+            "path": "main:nth-of-type(1) > p:nth-of-type(1)",
+            "url": "https://example.test/case-14-source-path-fragment#para-id"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Paragraph id source."
+          "text": "Paragraph id source.",
+          "type": "paragraph"
         },
         {
           "id": "named-anchor",
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-14-source-path-fragment#named-anchor",
             "fragment": "named-anchor",
-            "path": "main:nth-of-type(1) > p:nth-of-type(2)"
+            "path": "main:nth-of-type(1) > p:nth-of-type(2)",
+            "url": "https://example.test/case-14-source-path-fragment#named-anchor"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Paragraph named anchor source."
+          "text": "Paragraph named anchor source.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Path Source",
+      "id": "sec-14",
+      "level": 2,
       "source": {
-        "url": "https://example.test/case-14-source-path-fragment#sec-14",
         "fragment": "sec-14",
-        "path": "main:nth-of-type(1) > h2:nth-of-type(1)"
+        "path": "main:nth-of-type(1) > h2:nth-of-type(1)",
+        "url": "https://example.test/case-14-source-path-fragment#sec-14"
       }
     }
-  ]
+  ],
+  "snapshotId": "f3f4e5c5bbdbbc0ec9a621426cacf0594fd8eb32b18327506b805df04d041575",
+  "source": {
+    "bytes": 268,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-14-source-path-fragment",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "9fe1e4efae0c4f50ace5060f3b90d54bec62a0626ee7d040ca3848c22f12442a",
+    "snapshotId": "f3f4e5c5bbdbbc0ec9a621426cacf0594fd8eb32b18327506b805df04d041575",
+    "sourceUrl": "https://example.test/case-14-source-path-fragment"
+  },
+  "title": "Case 14",
+  "url": "https://example.test/case-14-source-path-fragment"
 }

@@ -1,38 +1,57 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-01-heading-anchor-fallback",
-  "title": "Case 01",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-01-heading-anchor-fallback",
-  "source": {
-    "fixtureId": "case-01-heading-anchor-fallback"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "b6d58e10c49daeda7b1bb350a4050c156418729be060542b04e71d36dda4d03c"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "intro-anchor",
-      "heading": "Intro Anchor",
-      "level": 2,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-01-heading-anchor-fallback",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-01-heading-anchor-fallback"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Alpha paragraph."
+          "text": "Alpha paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Intro Anchor",
+      "id": "intro-anchor",
+      "level": 2,
       "source": {
-        "url": "https://example.test/case-01-heading-anchor-fallback#intro-anchor",
         "fragment": "intro-anchor",
-        "path": "h2:nth-of-type(1)"
+        "path": "h2:nth-of-type(1)",
+        "url": "https://example.test/case-01-heading-anchor-fallback#intro-anchor"
       }
     }
-  ]
+  ],
+  "snapshotId": "63f127b165eca8f77eaae46a73635e9d4e84ee135e8dc79afc73cb9d83205a5a",
+  "source": {
+    "bytes": 170,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-01-heading-anchor-fallback",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "b6d58e10c49daeda7b1bb350a4050c156418729be060542b04e71d36dda4d03c",
+    "snapshotId": "63f127b165eca8f77eaae46a73635e9d4e84ee135e8dc79afc73cb9d83205a5a",
+    "sourceUrl": "https://example.test/case-01-heading-anchor-fallback"
+  },
+  "title": "Case 01",
+  "url": "https://example.test/case-01-heading-anchor-fallback"
 }

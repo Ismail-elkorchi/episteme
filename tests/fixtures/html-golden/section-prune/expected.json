@@ -1,73 +1,92 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/section-prune",
-  "title": "Section Prune",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-section-prune",
-  "source": {
-    "fixtureId": "section-prune"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "763909ad694c05d67ed12a5731d417a24a4b09e31b91f74d86e4fa83d2607bb2",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "82d1f0521f7ce33145a2674cdd8fea38503461b1f3cd75fa6001c00776581f5c"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "s1",
-      "heading": "Scope",
-      "level": 2,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/section-prune",
             "fragment": null,
-            "path": "main:nth-of-type(1) > section:nth-of-type(1) > p:nth-of-type(1)"
+            "path": "main:nth-of-type(1) > section:nth-of-type(1) > p:nth-of-type(1)",
+            "url": "https://example.test/section-prune"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Keep this sentence."
+          "text": "Keep this sentence.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Scope",
+      "id": "s1",
+      "level": 2,
       "source": {
-        "url": "https://example.test/section-prune#s1",
         "fragment": "s1",
-        "path": "main:nth-of-type(1) > section:nth-of-type(1) > h2:nth-of-type(1)"
+        "path": "main:nth-of-type(1) > section:nth-of-type(1) > h2:nth-of-type(1)",
+        "url": "https://example.test/section-prune#s1"
       }
     },
     {
-      "id": "s2",
-      "heading": "Examples",
-      "level": 2,
       "blocks": [
         {
           "id": null,
-          "normativity": "example",
-          "source": {
-            "url": "https://example.test/section-prune",
-            "fragment": null,
-            "path": "main:nth-of-type(1) > section:nth-of-type(2) > p:nth-of-type(1)"
-          },
           "links": [
             {
-              "text": "external link",
               "href": "https://example.test/x",
-              "resolvedId": null
+              "resolvedId": null,
+              "text": "external link"
             },
             {
-              "text": "local",
               "href": "#local",
-              "resolvedId": "local"
+              "resolvedId": "local",
+              "text": "local"
             }
           ],
-          "type": "paragraph",
-          "text": "Contains external link and local."
+          "normativity": "example",
+          "source": {
+            "fragment": null,
+            "path": "main:nth-of-type(1) > section:nth-of-type(2) > p:nth-of-type(1)",
+            "url": "https://example.test/section-prune"
+          },
+          "text": "Contains external link and local.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Examples",
+      "id": "s2",
+      "level": 2,
       "source": {
-        "url": "https://example.test/section-prune#s2",
         "fragment": "s2",
-        "path": "main:nth-of-type(1) > section:nth-of-type(2) > h2:nth-of-type(1)"
+        "path": "main:nth-of-type(1) > section:nth-of-type(2) > h2:nth-of-type(1)",
+        "url": "https://example.test/section-prune#s2"
       }
     }
-  ]
+  ],
+  "snapshotId": "8fad76340935d52b5facb11638c9a0bb89c5193477e05669df23e8aba7a5030a",
+  "source": {
+    "bytes": 489,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/section-prune",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "82d1f0521f7ce33145a2674cdd8fea38503461b1f3cd75fa6001c00776581f5c",
+    "snapshotId": "8fad76340935d52b5facb11638c9a0bb89c5193477e05669df23e8aba7a5030a",
+    "sourceUrl": "https://example.test/section-prune"
+  },
+  "title": "Section Prune",
+  "url": "https://example.test/section-prune"
 }

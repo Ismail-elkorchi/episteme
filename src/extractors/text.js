@@ -1,4 +1,5 @@
 import { normalizeText } from "../utils.js";
+import { documentBase } from "../document.js";
 
 export function extractTextDocument({
   text,
@@ -9,6 +10,7 @@ export function extractTextDocument({
   source,
   documentType,
   title,
+  provenance,
 }) {
   const blocks = splitIntoBlocks(text).map((blockText, index) => ({
     id: `p-${index + 1}`,
@@ -18,15 +20,16 @@ export function extractTextDocument({
   }));
 
   return {
-    schemaVersion: "0.1",
-    url,
-    title: title || url,
-    family: family || "generic",
-    authority: authority || "informative",
-    documentType: documentType || null,
-    snapshotId: snapshotId || null,
-    source: source || null,
-    extractedAt: new Date().toISOString(),
+    ...documentBase({
+      url,
+      title,
+      family,
+      authority,
+      documentType,
+      snapshotId,
+      source,
+      provenance,
+    }),
     sections: [
       {
         id: null,

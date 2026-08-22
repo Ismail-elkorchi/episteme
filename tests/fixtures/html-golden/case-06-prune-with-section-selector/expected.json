@@ -1,62 +1,81 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-06-prune-with-section-selector",
-  "title": "Case 06",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-06-prune-with-section-selector",
-  "source": {
-    "fixtureId": "case-06-prune-with-section-selector"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "511d75024d0afadacd5357e7891adb7ec14f6a06544b49a47558c4349d6c7bea",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "6a39a58ab7030c72c7f189cf48da956ba7cb0a94dcb6d074b7add5f6691e019f"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "left",
-      "heading": "Left",
-      "level": 2,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-06-prune-with-section-selector",
             "fragment": null,
-            "path": "section:nth-of-type(1) > p:nth-of-type(1)"
+            "path": "section:nth-of-type(1) > p:nth-of-type(1)",
+            "url": "https://example.test/case-06-prune-with-section-selector"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Left kept paragraph."
+          "text": "Left kept paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Left",
+      "id": "left",
+      "level": 2,
       "source": {
-        "url": "https://example.test/case-06-prune-with-section-selector#left",
         "fragment": "left",
-        "path": "section:nth-of-type(1) > h2:nth-of-type(1)"
+        "path": "section:nth-of-type(1) > h2:nth-of-type(1)",
+        "url": "https://example.test/case-06-prune-with-section-selector#left"
       }
     },
     {
-      "id": "right",
-      "heading": "Right",
-      "level": 2,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-06-prune-with-section-selector",
             "fragment": null,
-            "path": "section:nth-of-type(2) > p:nth-of-type(1)"
+            "path": "section:nth-of-type(2) > p:nth-of-type(1)",
+            "url": "https://example.test/case-06-prune-with-section-selector"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Right kept paragraph."
+          "text": "Right kept paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Right",
+      "id": "right",
+      "level": 2,
       "source": {
-        "url": "https://example.test/case-06-prune-with-section-selector#right",
         "fragment": "right",
-        "path": "section:nth-of-type(2) > h2:nth-of-type(1)"
+        "path": "section:nth-of-type(2) > h2:nth-of-type(1)",
+        "url": "https://example.test/case-06-prune-with-section-selector#right"
       }
     }
-  ]
+  ],
+  "snapshotId": "217728245a3c0d765052af1ad99a383c258413aea986887bf92c0e7db8a4d48a",
+  "source": {
+    "bytes": 355,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-06-prune-with-section-selector",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "6a39a58ab7030c72c7f189cf48da956ba7cb0a94dcb6d074b7add5f6691e019f",
+    "snapshotId": "217728245a3c0d765052af1ad99a383c258413aea986887bf92c0e7db8a4d48a",
+    "sourceUrl": "https://example.test/case-06-prune-with-section-selector"
+  },
+  "title": "Case 06",
+  "url": "https://example.test/case-06-prune-with-section-selector"
 }
