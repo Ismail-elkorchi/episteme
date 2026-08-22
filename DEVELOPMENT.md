@@ -93,11 +93,7 @@ To release:
 The release workflow checks that the tag, npm package, JSR package, runtime, and GitHub
 pre-release state agree. It accepts only release commits contained in `main`, reruns every gate,
 performs both registry dry-runs, rejects an existing version, publishes npm with provenance,
-and publishes JSR through the linked repository's short-lived OIDC identity. Manual workflow
-dispatch is preflight-only and cannot publish.
-
-The first npm release uses the short-lived, granular `NPM_TOKEN` repository secret. Once the
-package exists, configure `Ismail-elkorchi/episteme` and `release.yml` as its npm trusted
-publisher. Then update the workflow to remove the bootstrap credential, verify the next release
-through OIDC, remove the repository secret, and disallow token publishing. JSR requires no secret
-because the package is linked to this GitHub repository.
+and publishes both registries through short-lived OIDC identities. npm generates provenance
+automatically for its trusted publisher; JSR records provenance for the linked GitHub repository.
+Neither registry uses a repository secret. Manual workflow dispatch is preflight-only and cannot
+publish.
