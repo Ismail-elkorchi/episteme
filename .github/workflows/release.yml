@@ -51,7 +51,7 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ steps.toolversions.outputs.node }}
-          cache: npm
+          package-manager-cache: false
           registry-url: https://registry.npmjs.org
 
       - name: Setup Deno
@@ -150,8 +150,6 @@ jobs:
       - name: Publish npm
         if: ${{ steps.meta.outputs.dry_run != 'true' }}
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-        run: |
-          unset NODE_AUTH_TOKEN
-          npm config delete //registry.npmjs.org/:_authToken || true
-          npm publish --provenance --access public
+        run: npm publish --provenance --access public

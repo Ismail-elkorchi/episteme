@@ -45,4 +45,6 @@ To release:
 2. Merge a PR with all release gates passing.
 3. Push the matching `v<version>` tag.
 
-The release workflow validates the tag, checks that the npm version is new, publishes with npm trusted publishing and provenance, and creates a GitHub release. The repository must be configured as a trusted publisher for `episteme`; no long-lived npm token is used.
+The release workflow validates the tag, checks that the npm version is new, publishes with provenance, and creates a GitHub release.
+
+The first release claims the new package name and therefore needs a short-lived, granular npm automation token in the `NPM_TOKEN` repository secret. After that release, configure `Ismail-elkorchi/episteme` and `release.yml` as the package's npm trusted publisher, delete the bootstrap secret, and disallow token-based publishing. Subsequent releases then use short-lived OIDC credentials without a stored publishing token.
