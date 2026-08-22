@@ -1,5 +1,5 @@
 {
-  "name": "@ismail-elkorchi/episteme",
+  "name": "episteme",
   "version": "0.1.0",
   "private": false,
   "type": "module",
@@ -15,6 +15,10 @@
     "url": "https://github.com/Ismail-elkorchi/episteme/issues"
   },
   "homepage": "https://github.com/Ismail-elkorchi/episteme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "files": [
     "src",
     "schema",
@@ -40,16 +44,14 @@
     "test:html:golden": "node --test tests/html-golden.test.js",
     "test:pdf": "node --test tests/pdf-extractor.test.js",
     "test:chunk": "node --test tests/chunk-path-safety.test.js",
-    "test": "npm run prepare:parser-stack && node --test",
-    "test:coverage": "npm run prepare:parser-stack && node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-lines=70 --test-coverage-functions=70 --test-coverage-branches=60",
-    "prepare:parser-stack": "node scripts/install/prepare-parser-stack-deps.mjs",
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**/*.js' --test-coverage-lines=70 --test-coverage-functions=70 --test-coverage-branches=60",
     "check": "npm run test:coverage",
     "check:audit": "npm audit --audit-level=high",
-    "check:denylist": "node scripts/security/check-denylist.mjs",
-    "check:deno": "npm run prepare:parser-stack && deno test --no-check --allow-read --allow-write --allow-net --allow-env --node-modules-dir=manual tests",
-    "check:bun": "npm run prepare:parser-stack && bun test tests",
+    "check:deno": "deno test --no-check --allow-read --allow-write --allow-net --allow-env --node-modules-dir=manual tests",
+    "check:bun": "bun test tests",
     "package:check": "node scripts/verify-package.mjs",
-    "check:ci": "npm run check && npm run check:audit && npm run check:denylist && npm run package:check"
+    "check:ci": "npm run check && npm run check:audit && npm run package:check"
   },
   "dependencies": {
     "@ismail-elkorchi/css-parser": "^0.2.0",

@@ -1,25 +1,22 @@
-# AGENTS.md (Episteme Contributor Contract)
+# AGENTS.md
 
-This file defines the public, repository-local contract for contributors and coding agents working in this repository.
+Repository guidance for contributors and coding agents.
 
-## Start Here
-- Open [docs/INDEX.md](docs/INDEX.md) first.
-- Keep the Doc Map canonical: every `.md` file must be reachable from `AGENTS.md` through the indexes.
-- After Markdown changes, run the project doc-map audit in the private project workspace.
+## Start here
 
-## Public Surface and Boundaries
-- Keep this repository contributor-facing and product-focused.
-- Preserve package boundary guarantees: consumer packages ship runtime/CLI surfaces only.
-- Do not leak internal-only control artifacts into published package surfaces.
+- Read `README.md` for the product and CLI.
+- Read `DEVELOPMENT.md` before changing implementation or release behavior.
+- Use `npm ci` for a reproducible install.
+
+## Boundaries
+
+- Keep extraction deterministic from a recorded snapshot and manifest.
+- Preserve provenance in generated documents and chunks.
 - Do not bypass access controls, CAPTCHA gates, or licensing constraints.
+- Keep the npm package limited to the CLI, runtime sources, schema, license, and README.
 
-## Change Classes and Required Checks
-- Docs/index updates: run project doc-map audit in the private project workspace.
-- Product code or extractor changes: `npm run check`.
-- Packaging, schema-contract, or other high-impact product checks: `npm run check:ci`.
+## Required checks
 
-## Contributor References
-- `README.md`
-- `DEVELOPMENT.md`
-- `SPEC.md`
-- `docs/INDEX.md`
+- Product or extractor changes: `npm run check`.
+- Packaging, dependency, schema, or release changes: `npm run check:ci`.
+- Cross-runtime changes: also run `npm run check:deno` and `npm run check:bun`.

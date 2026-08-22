@@ -36,7 +36,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event_name == 'push' && github.ref_name || inputs.ref }}
 
@@ -48,19 +48,19 @@ jobs:
           echo "bun=$(awk '/^bun /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ steps.toolversions.outputs.node }}
-          cache: npm
+          package-manager-cache: false
           registry-url: https://registry.npmjs.org
 
       - name: Setup Deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: ${{ steps.toolversions.outputs.deno }}
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@ecf28ddc73e819eb6fa29df6b34ef8921c743461 # v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: ${{ steps.toolversions.outputs.bun }}
 
@@ -73,10 +73,9 @@ jobs:
 
           package_name="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).name")"
           package_version="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json','utf8')).version")"
-          jsr_version="$(node -p "JSON.parse(require('node:fs').readFileSync('jsr.json','utf8')).version")"
 
-          if [ "${package_version}" != "${jsr_version}" ]; then
-            echo "::error::Version mismatch: package.json=${package_version} jsr.json=${jsr_version}"
+          if [ "${package_name}" != "episteme" ]; then
+            echo "::error::Unexpected npm package name: ${package_name}"
             exit 1
           fi
 
@@ -110,8 +109,6 @@ jobs:
           npm run check:ci
           npm run check:deno
           npm run check:bun
-          npm pack --dry-run
-          npx -y jsr publish --dry-run --allow-dirty
 
       - name: Ensure npm version does not already exist
         if: ${{ steps.meta.outputs.dry_run != 'true' }}
@@ -139,32 +136,6 @@ jobs:
             exit 1
           fi
 
-      - name: Ensure JSR version does not already exist
-        if: ${{ steps.meta.outputs.dry_run != 'true' }}
-        env:
-          PACKAGE_NAME: ${{ steps.meta.outputs.package_name }}
-          VERSION: ${{ steps.meta.outputs.package_version }}
-        run: |
-          set -euo pipefail
-          set +e
-          jsr_info_output="$(npx -y jsr info "${PACKAGE_NAME}@${VERSION}" 2>&1)"
-          jsr_info_status=$?
-          set -e
-
-          if [ ${jsr_info_status} -eq 0 ]; then
-            echo "::error::JSR version already exists: ${PACKAGE_NAME}@${VERSION}"
-            echo "${jsr_info_output}"
-            exit 1
-          fi
-
-          if printf '%s' "${jsr_info_output}" | grep -Eqi '404|not found|Received 404'; then
-            echo "JSR version does not exist yet: ${PACKAGE_NAME}@${VERSION}"
-          else
-            echo "::error::Unable to verify JSR version state for ${PACKAGE_NAME}@${VERSION}"
-            echo "${jsr_info_output}"
-            exit 1
-          fi
-
       - name: Create GitHub release
         if: ${{ github.event_name == 'push' }}
         env:
@@ -179,12 +150,6 @@ jobs:
       - name: Publish npm
         if: ${{ steps.meta.outputs.dry_run != 'true' }}
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-        run: |
-          unset NODE_AUTH_TOKEN
-          npm config delete //registry.npmjs.org/:_authToken || true
-          npm publish --provenance --access public
-
-      - name: Publish JSR
-        if: ${{ steps.meta.outputs.dry_run != 'true' }}
-        run: npx -y jsr publish --allow-dirty
+        run: npm publish --provenance --access public

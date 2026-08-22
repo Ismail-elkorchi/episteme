@@ -1,24 +1,11 @@
 ## Summary
-- [ ] Describe what changed and why.
-- [ ] Confirm this description is historical (what was done), not aspirational.
 
-## User-visible changes
-- [ ] List externally observable behavior or interface changes.
-- [ ] If no user-visible changes, explicitly state "None".
+Describe what changed and why.
 
-## Evidence
-- [ ] Paste commands run and summarize outputs.
-- [ ] Include:
-  - `npm test`
-  - `npm run check:deno`
-  - `npm run check:bun`
-- [ ] If HTML extraction engine behavior changed, include parity report delta.
+## Verification
+
+List the commands or checks run.
 
 ## Risk and rollback
-- [ ] List key risks introduced by this PR.
-- [ ] List rollback path.
 
-## Additional checklist
-- [ ] PR title follows Conventional Commits.
-- [ ] Breaking-change status is explicitly stated.
-- [ ] Docs are present tense and match current behavior.
+Note user-visible or breaking changes, important risks, and the rollback path when relevant.

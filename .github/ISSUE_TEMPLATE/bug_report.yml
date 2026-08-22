@@ -15,13 +15,7 @@ body:
       description: Provide minimal synthetic input and exact commands.
     validations:
       required: true
-  - type: textarea
+  - type: input
     attributes:
-      label: Runtime matrix
-      description: Node/Deno/Bun results.
-      placeholder: |
-        node: pass/fail
-        deno: pass/fail
-        bun: pass/fail
-    validations:
-      required: true
+      label: Environment
+      description: Episteme version, runtime, runtime version, and operating system.
