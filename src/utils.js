@@ -69,20 +69,6 @@ export function nowIso() {
   return new Date().toISOString();
 }
 
-export function chunkText(text, maxLength = 4000) {
-  if (text.length <= maxLength) {
-    return [text];
-  }
-  const chunks = [];
-  let start = 0;
-  while (start < text.length) {
-    const end = Math.min(start + maxLength, text.length);
-    chunks.push(text.slice(start, end));
-    start = end;
-  }
-  return chunks;
-}
-
 export function stableSectionKey(section, index) {
   if (section.id) {
     return section.id.replace(/\s+/g, "-");
@@ -92,10 +78,6 @@ export function stableSectionKey(section, index) {
 
 export function normalizeText(text) {
   return (text || "").replace(/\s+/g, " ").trim();
-}
-
-export function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function parseCharset(contentType = "") {

@@ -55,7 +55,9 @@ export async function chunkAll({ inputDir, outDir }) {
           normativity: block?.normativity || null,
         };
 
-        const fileName = `${docId}--${sectionKey}--${blockKey}.json`;
+        // Extracted IDs originate in untrusted source documents. Keep them in
+        // chunk metadata, but never use them as filesystem path components.
+        const fileName = `${docId}--${sha256Hex(Buffer.from(chunkId, "utf8"))}.json`;
         const filePath = path.join(baseDir, fileName);
         await writeJson(filePath, chunk);
 
