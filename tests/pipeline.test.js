@@ -12,7 +12,7 @@ import { diffDirectories } from "../src/pipeline/diff.js";
 import { extractAll } from "../src/pipeline/extract.js";
 import { buildIndex, queryIndex } from "../src/pipeline/index.js";
 import { manualIngest } from "../src/pipeline/manual-ingest.js";
-import { loadSnapshotContent } from "../src/pipeline/snapshot.js";
+import { loadSnapshotContent, snapshotAll } from "../src/pipeline/snapshot.js";
 import { fingerprintJson, withFingerprint, writeJson } from "../src/utils.js";
 import { assertArtifact, assertSchema } from "./helpers/schema-validator.js";
 import { extractionFixture } from "./helpers/extraction-fixture.js";
@@ -207,6 +207,45 @@ test("failed and cancelled corpus updates preserve the previous committed indexe
     (error) => error.code === "CANCELLED" && error.exitCode === 130,
   );
   assert.deepEqual(await fs.readFile(path.join(chunksDir, "index.json")), committedChunks);
+});
+
+test("rejects a snapshot index that rebinds content to another source", async (t) => {
+  const root = await makeTempDir(t, "episteme-snapshot-rebinding-");
+  const firstPath = path.join(root, "first.txt");
+  const secondPath = path.join(root, "second.txt");
+  const mapPath = path.join(root, "map.json");
+  const snapshotsDir = path.join(root, "snapshots");
+  const specsDir = path.join(root, "specs");
+  const firstUrl = "https://example.test/first";
+  const secondUrl = "https://example.test/second";
+  await fs.writeFile(firstPath, "First source evidence.", "utf8");
+  await fs.writeFile(secondPath, "Second source evidence.", "utf8");
+  await fs.writeFile(mapPath, JSON.stringify([
+    { sourceUrl: firstUrl, localPath: firstPath, contentType: "text/plain; charset=utf-8" },
+    { sourceUrl: secondUrl, localPath: secondPath, contentType: "text/plain; charset=utf-8" },
+  ]));
+  await manualIngest({ mapPath, snapshotsDir });
+  const indexPath = path.join(snapshotsDir, "index.json");
+  const index = JSON.parse(await fs.readFile(indexPath, "utf8"));
+  index.entries[firstUrl].latest = index.entries[secondUrl].latest;
+  index.entries[firstUrl].history.push(index.entries[secondUrl].latest);
+  await writeJson(indexPath, withFingerprint(index));
+
+  await assert.rejects(
+    snapshotAll({ manifest: [{ url: firstUrl }], outDir: snapshotsDir }),
+    (error) => error.code === "INVALID_INPUT" && /source mismatch/u.test(error.message),
+  );
+
+  const plugins = await loadFamilyPlugins();
+  await assert.rejects(
+    extractAll({
+      manifest: [{ url: firstUrl, family: "generic", authority: null, extractor: "text" }],
+      snapshotsDir,
+      outDir: specsDir,
+      resolvePlugin: pluginResolver(plugins),
+    }),
+    (error) => error.code === "INVALID_INPUT" && /source mismatch/u.test(error.message),
+  );
 });
 
 test("runs a byte-reproducible extraction and bounded ranked query pipeline", async (t) => {

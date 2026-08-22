@@ -54,6 +54,17 @@ export async function snapshotAll({
         snapshotId: existing.latest,
       });
     }
+    if (existing && (
+      existing.url !== url ||
+      recordedSnapshot?.meta.sourceUrl !== url
+    )) {
+      throw inputError(`Snapshot index source mismatch for ${url}`, {
+        url,
+        indexedUrl: existing.url ?? null,
+        snapshotUrl: recordedSnapshot?.meta.sourceUrl ?? null,
+        snapshotId: existing.latest ?? null,
+      });
+    }
     if (reuseExisting && existing?.latest) {
       results.push({ status: "reused", url, snapshotId: existing.latest });
       onProgress({

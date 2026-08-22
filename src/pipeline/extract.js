@@ -70,6 +70,14 @@ export async function extractAll({
         snapshotId,
       });
     }
+    if (snapshotEntry.url !== normalizedUrl.toString() || snapshot.meta.sourceUrl !== normalizedUrl.toString()) {
+      throw inputError(`Snapshot index source mismatch for ${sourceUrl}`, {
+        url: sourceUrl,
+        indexedUrl: snapshotEntry.url ?? null,
+        snapshotUrl: snapshot.meta.sourceUrl ?? null,
+        snapshotId,
+      });
+    }
     const plugin = resolvePlugin(sourceUrl, entry.family);
     const authority = entry.authority || plugin.authority || "informative";
     const familyId = plugin.id;
