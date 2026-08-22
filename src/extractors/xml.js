@@ -61,7 +61,7 @@ export function extractXmlDocument({
     : buildGenericXmlSections(rootName || "document", rootNode);
 
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url,
     title: title || url,
     family: family || "generic",
@@ -128,7 +128,7 @@ function toExtractorNode(node) {
 
 function buildErrorDoc({ url, family, authority, snapshotId, source, documentType, title, warning }) {
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url,
     title: title || url,
     family: family || "generic",

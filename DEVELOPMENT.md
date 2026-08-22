@@ -17,7 +17,7 @@ npm test
 - `scripts/verify-package.mjs`: npm package boundary checks.
 - `.github/workflows/`: CI, security scanning, compatibility checks, and release automation.
 
-HTML extraction uses `@ismail-elkorchi/html-parser` with `@ismail-elkorchi/css-parser`. XML/XSD extraction uses `@ismail-elkorchi/xml-parser`, and PDF extraction uses `pdfjs-dist`. These are ordinary npm dependencies; no preparation step or sibling repository is required.
+HTML extraction uses `@ismail-elkorchi/html-parser` with `@ismail-elkorchi/css-parser`. XML/XSD extraction uses `@ismail-elkorchi/xml-parser`, and PDF extraction uses `@ismail-elkorchi/pdf-engine`. These are ordinary npm dependencies; no preparation step or sibling repository is required.
 
 ## Verification
 

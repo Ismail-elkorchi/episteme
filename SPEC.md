@@ -18,7 +18,7 @@ Network retrieval is not deterministic. Given the same snapshots, manifest, vers
 ## Extraction
 
 - HTML is parsed statically; scripts are not executed.
-- PDF extraction uses JavaScript only and does not require a system executable.
+- PDF extraction uses `@ismail-elkorchi/pdf-engine` and preserves native structured content, diagnostics, and page-level provenance without requiring a system executable.
 - XML/XSD extraction emits structured schema information, including annotations, facets, model summaries, and XSD 1.1 assertions when present.
 - Text extraction preserves useful line structure.
 

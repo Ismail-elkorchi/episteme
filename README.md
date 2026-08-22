@@ -56,7 +56,7 @@ npx episteme pipeline --manifest ./manifest.json
 ```
 
 The published package already depends on the published parser stack packages.
-You do not need to install `@ismail-elkorchi/html-parser`, `@ismail-elkorchi/css-parser`, or `@ismail-elkorchi/xml-parser` manually for the default path.
+You do not need to install `@ismail-elkorchi/html-parser`, `@ismail-elkorchi/css-parser`, `@ismail-elkorchi/xml-parser`, or `@ismail-elkorchi/pdf-engine` manually for the default path.
 
 ## CLI Commands
 - `snapshot`: fetch and store deterministic snapshots under `snapshots/`.
@@ -97,6 +97,9 @@ Optional:
 - `specs/`: structured documents (JSON or Markdown)
 - `chunks/`: block-level chunks + index
 - `snapshots/`: raw snapshots + metadata
+
+PDF documents retain native reading order, tables, page citations, source spans,
+diagnostics, and known extraction limits in the structured JSON output.
 
 ## Schemas
 - Extracted document schema: `schema/document.schema.json`

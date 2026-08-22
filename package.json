@@ -56,8 +56,8 @@
   "dependencies": {
     "@ismail-elkorchi/css-parser": "^0.2.0",
     "@ismail-elkorchi/html-parser": "^0.2.1",
-    "@ismail-elkorchi/xml-parser": "^0.2.0",
-    "pdfjs-dist": "^6.2.108"
+    "@ismail-elkorchi/pdf-engine": "0.1.0",
+    "@ismail-elkorchi/xml-parser": "^0.2.0"
   },
   "license": "MIT",
   "devDependencies": {

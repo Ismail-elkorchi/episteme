@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import { loadManifest } from "../src/manifest.js";
 import { loadFamilyPlugins, resolveFamily } from "../src/registry.js";
 import { chunkAll } from "../src/pipeline/chunk.js";
@@ -21,7 +22,7 @@ async function makeTempDir(t, prefix) {
 
 function documentFixture({ sections, snapshotId = "snapshot-1" }) {
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url: "https://example.test/document",
     title: "Document",
     family: "generic",
@@ -131,6 +132,48 @@ test("runs the offline extract, chunk, index, and query pipeline", async (t) => 
   assert.equal(results.length, 1);
   assert.equal(results[0].heading, "Entry");
   assert.deepEqual(await queryIndex({ indexFile, term: "searchable", family: "w3c" }), []);
+});
+
+test("preserves PDF provenance and known limits through the offline pipeline", async (t) => {
+  const root = await makeTempDir(t, "episteme-pdf-pipeline-");
+  const mapPath = path.join(root, "map.json");
+  const snapshotsDir = path.join(root, "snapshots");
+  const specsDir = path.join(root, "specs");
+  const chunksDir = path.join(root, "chunks");
+  const sourceUrl = "https://example.test/minimal.pdf";
+  const localPath = fileURLToPath(new URL("./fixtures/minimal.pdf", import.meta.url));
+
+  await fs.writeFile(
+    mapPath,
+    JSON.stringify([{ sourceUrl, localPath, contentType: "application/pdf" }]),
+    "utf8",
+  );
+  await manualIngest({ mapPath, snapshotsDir });
+
+  const plugins = await loadFamilyPlugins();
+  await extractAll({
+    manifest: [{ url: sourceUrl, family: "generic", extractor: "pdf", output: "document" }],
+    snapshotsDir,
+    outDir: specsDir,
+    plugins: {
+      list: plugins,
+      resolve: (url, explicit) => resolveFamily(plugins, url, explicit),
+    },
+  });
+
+  const extracted = JSON.parse(await fs.readFile(path.join(specsDir, "document.json"), "utf8"));
+  await assertSchema(extracted, "offline-pdf-document");
+  assert.equal(extracted.extractedAt, extracted.source.fetchedAt);
+  assert.deepEqual(extracted.sections[0].blocks[0].source.pageNumbers, [1]);
+
+  await chunkAll({ inputDir: specsDir, outDir: chunksDir });
+  const chunkIndex = JSON.parse(await fs.readFile(path.join(chunksDir, "index.json"), "utf8"));
+  const chunk = JSON.parse(
+    await fs.readFile(path.join(chunksDir, chunkIndex.chunks[0].path), "utf8"),
+  );
+  assert.deepEqual(chunk.source.pageNumbers, [1]);
+  assert.deepEqual(chunk.knownLimits, extracted.pdf.knownLimits);
+  assert.deepEqual(chunk.diagnostics, extracted.diagnostics);
 });
 
 test("reports added, removed, and changed sections", async (t) => {

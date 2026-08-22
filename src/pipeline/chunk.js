@@ -50,6 +50,8 @@ export async function chunkAll({ inputDir, outDir }) {
           text,
           source: block?.source || section?.source || null,
           links: block?.links || [],
+          diagnostics: doc.diagnostics || [],
+          knownLimits: doc.pdf?.knownLimits || [],
           snapshotId: doc.snapshotId || null,
           extractedAt: doc.extractedAt || null,
           normativity: block?.normativity || null,
@@ -71,6 +73,7 @@ export async function chunkAll({ inputDir, outDir }) {
           blockType: chunk.blockType,
           url: chunk.url,
           fragment: chunk.fragment,
+          knownLimits: chunk.knownLimits,
           path: path.relative(outDir, filePath),
           textHash: sha256Hex(Buffer.from(text, "utf8")),
         });
