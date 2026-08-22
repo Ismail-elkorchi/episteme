@@ -119,16 +119,6 @@ jobs:
             echo "publish=${publish}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Verify npm bootstrap credential
-        if: ${{ steps.meta.outputs.publish == 'true' }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "${NODE_AUTH_TOKEN}" ]; then
-            echo "::error::NPM_TOKEN is required until npm trusted publishing is configured"
-            exit 1
-          fi
-
       - name: Install
         run: npm ci
 
@@ -196,10 +186,8 @@ jobs:
       - name: Publish npm
         if: ${{ steps.meta.outputs.publish == 'true' && steps.registry.outputs.npm_exists != 'true' }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
           NPM_TAG: ${{ steps.meta.outputs.npm_tag }}
-        run: npm publish --access public --provenance --tag "${NPM_TAG}"
+        run: npm publish --access public --tag "${NPM_TAG}"
 
       - name: Publish JSR
         if: ${{ steps.meta.outputs.publish == 'true' && steps.registry.outputs.jsr_exists != 'true' }}

@@ -16,8 +16,7 @@
   },
   "homepage": "https://github.com/Ismail-elkorchi/episteme",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "files": [
     "src",
