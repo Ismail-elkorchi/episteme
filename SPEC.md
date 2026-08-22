@@ -1,86 +1,33 @@
-# Episteme Specification (Developer Surface)
+# Episteme Behavior Contract
 
-Back to [docs/INDEX.md](docs/INDEX.md).
+## Pipeline
 
-This document defines operational terms used by Episteme development. It is not part of the consumer surface.
+Episteme operates as four composable stages:
 
-## Definitions
+1. `snapshot` records remote content and retrieval metadata.
+2. `extract` transforms snapshots into structured documents.
+3. `chunk` writes addressable blocks without allowing document-controlled IDs to escape the output directory.
+4. `index` builds a searchable index from those chunks.
 
-### Claim
-A declarative statement about Episteme behavior, outputs, or process.
+`pipeline` runs all four stages. `manual-ingest` creates snapshots from local files, and `diff` compares extracted directories.
 
-### Invariant
-A Claim that must hold in all acceptable states. An Invariant requires an enforcement mechanism.
+## Determinism and provenance
 
-### Oracle
-A mechanism that evaluates a Claim as PASS/FAIL (or SCORE). Examples: tests, schema validation, static analysis.
+Network retrieval is not deterministic. Given the same snapshots, manifest, version, and options, extraction, chunking, and indexing must be reproducible. Generated documents retain their source URL, snapshot reference, authority, and extractor metadata.
 
-### Evidence
-A durable artifact produced by an Oracle. Evidence must be machine-readable when possible and traceable to a commit/run.
+## Extraction
 
-### Proof (Project Meaning)
-Evidence that, under Episteme’s accepted rules, is sufficient to accept a Claim.
+- HTML is parsed statically; scripts are not executed.
+- PDF extraction uses JavaScript only and does not require a system executable.
+- XML/XSD extraction emits structured schema information, including annotations, facets, model summaries, and XSD 1.1 assertions when present.
+- Text extraction preserves useful line structure.
 
-### Falsification
-A counterexample that demonstrates a Claim is false (failing test, failed validation, regression).
+Extracted JSON documents must validate against `schema/document.schema.json`.
 
-### Undecided
-A Claim with missing or inconclusive Evidence. Undecided claims must not be presented as accepted.
+## Compatibility
 
-## Evidence Policy
-- No decision is accepted without evidence.
-- Invariants must cite their enforcement Oracle and Evidence.
-- If Evidence is missing, the Claim remains Undecided and the cycle must default to Search.
+The supported Node version is declared in `package.json` and pinned in `.tool-versions`. The extraction path is also tested with the pinned Deno and Bun versions. Runtime-specific CLI subprocess tests may run only on Node.
 
-## Operational Requirements
+## Distribution
 
-### XML/XSD Extraction
-- XML/XSD extraction must produce structured schema output (not plain text).
-
-### XML/XSD Conformance
-- Conform to XML Schema 1.1 Part 1 (Structures) and Part 2 (Datatypes).
-- Facet and XSD 1.1 assertion extraction must be captured when present.
-
-### Schema Validation
-- Extracted documents must validate against schema/document.schema.json, including the fragment field.
-
-### Runtime Parity
-- Guarantees required: deterministic parsing of static snapshots across Node, Deno, and Bun.
-- Error cost: medium; extraction parity is required for the app's core promise.
-- Stability vs generativity: favor stability and cross-runtime determinism over dynamic rendering.
-- Complexity budget: moderate; acceptable to add small parsing dependencies.
-- Security posture: avoid external binaries and reduce runtime permissions.
-- Chosen approach: parser-stack (`html-parser` + `css-parser`) for HTML and pdfjs-dist for PDF (single JS-only path).
-- Trade-offs: reduced dynamic rendering fidelity; reliance on JS parsers.
-
-### Consumer Surface
-- Guarantees required: consumer artifacts exclude governance docs; published CLI is executable.
-- Error cost: governance leakage into consumer packages.
-- Stability vs generativity: prioritize stability and clarity over maximal features.
-- Complexity budget: minimal packaging tooling.
-- Security posture: least exposure of internal docs.
-
-### Distribution
-- Guarantees required: npm/jsr package metadata matches publishing account.
-- Error cost: medium; incorrect scope breaks installation and discoverability.
-- Stability vs generativity: favor stable naming and discoverability.
-- Complexity budget: minimal.
-- Security posture: no change to access or execution behavior.
-- Package scope is @ismail-elkorchi/episteme with aligned repository metadata.
-
-## Schema
-
-### Mandate
-- Problem: the document schema title referenced the pre-rebrand name and did not include the fragment field used by extraction.
-- Non-goals: redesign the schema or add new extraction fields beyond current outputs.
-
-### Criteria
-- Guarantees required: schema matches current extractor output fields.
-- Error cost: low to medium; mismatched schema misleads consumers.
-- Stability vs generativity: favor stability; only minimal additive change.
-- Complexity budget: minimal change only.
-- Security posture: no change to access or execution behavior.
-
-### Selection
-- Chosen combination: update schema title and add missing fragment field.
-- Trade-offs: schema remains a maintained contract and must track future output changes.
+The CLI command and npm package are both named `episteme`. The npm artifact contains only runtime sources, schema, license, package metadata, and the README. A stable programmatic API is not guaranteed in the current release.

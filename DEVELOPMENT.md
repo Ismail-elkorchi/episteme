@@ -1,141 +1,48 @@
 # Episteme Development Guide
 
-Back to [docs/INDEX.md](docs/INDEX.md).
+## Setup
 
-This document is for Episteme developers. It is not part of the consumer surface.
+The supported tool versions are recorded in `.tool-versions`.
 
-## Roles (Developer Surface)
-- Human Developer: owns Episteme roadmap, reviews high-impact changes, and approves releases.
-- Coding Agent: implements scoped changes, runs required oracles, and reports evidence.
+```sh
+npm ci
+npm test
+```
 
-Consumers use only the CLI and published package interfaces.
+## Repository layout
 
-## Repository Boundary
-- This repository stays contributor-facing and product-focused.
-- Private method artifacts (meta loops, cycle logs, agent habits, and runtime history) are externalized from this repository.
-- Do not reintroduce private control artifacts into this repository root.
+- `src/`: CLI, extraction engines, and pipeline stages.
+- `schema/`: the extracted-document JSON Schema.
+- `tests/`: Node test-runner suites and synthetic fixtures.
+- `scripts/verify-package.mjs`: npm package boundary checks.
+- `.github/workflows/`: CI, security scanning, compatibility checks, and release automation.
 
-## Development Surfaces
-- Product code: `src/`
-- Schema contract: `schema/`
-- Test suite and fixtures: `tests/`
-- Public contributor docs: `README.md`, `SPEC.md`, `docs/**`
-- Design rationale: this document (`DEVELOPMENT.md`)
-
-## Consumer Surface (Read-Only)
-- Mandate: consumer packages must not expose governance or development content.
-- Non-goals: redesigning the extraction pipeline or schema.
-- npm/jsr packages should ship only runtime, CLI, and consumer docs.
-- Governance and development sources must be excluded from consumer packages.
-- Selection: Method A now (npm files + .npmignore + jsr excludes); trade-off is dependence on checks. Revisit a monorepo split if enforcement proves insufficient.
-
-## Non-Goals
-- Video content is out of scope; MP4 removed.
-
-## Manual Ingest
-- Manual-ingest supports refresh semantics via --refresh.
-- CLI accepts --refresh for manual-ingest; README updated to document usage.
-- Refresh uses file hash comparisons.
-- Manual refresh sample created for validation and used to confirm refresh behavior.
-- Checklist outcome: refresh validated; XML Schema 1.1 source added; coverage map updated.
-
-## XML/XSD Extractor
-- XML extractor uses `@ismail-elkorchi/xml-parser` and produces XSD-aware sections.
-- Parser captures attributes, groups, schema metadata, annotations, facets, and model summaries.
+HTML extraction uses `@ismail-elkorchi/html-parser` with `@ismail-elkorchi/css-parser`. XML/XSD extraction uses `@ismail-elkorchi/xml-parser`, and PDF extraction uses `pdfjs-dist`. These are ordinary npm dependencies; no preparation step or sibling repository is required.
 
 ## Verification
-- Canonical command: `npm run check`
-- Holdout tier: `npm run check:holdout`
-- CI gate: `npm run check:ci`
-- Dependency denylist gate: `npm run check:denylist` (fails on banned parser dependencies).
-- Parser incident handoff contract: `docs/PARSER_INCIDENT_HANDOFF.md`
-- XML/XSD tests cover PREMIS facets and a synthetic XSD 1.1 assertion.
-- `test:xml` runs XML extractor tests.
-- XML root selection ignores XML declarations/processing instructions.
-- Schema validation helper is applied in XML/HTML/PDF tests.
-- Runtime parity oracles: cross-runtime HTML/PDF extraction tests; rival check vs prior Playwright extraction on a sample snapshot.
-- Runtime parity falsifiers: synthetic HTML/PDF fixtures validated against schema.
-- Schema verification: schema diff against output examples; fragment field check (manual until automated).
-- Consumer surface verification: `npm pack --dry-run`, jsr exclude validation, and package:check failure on leaked paths.
-- Distribution verification: `npm pack --dry-run`, scoped install check, and CLI bin continuity (`episteme`).
-- Parser artifact preparation: `npm run prepare:parser-stack` verifies published parser artifacts and only builds source installs when `EPISTEME_PREPARE_PARSER_STACK_FROM_SOURCE=1` is set.
 
-## Testing Fixtures
-- PREMIS XSD and W3C xml.xsd are baseline fixtures.
-- XML/XSD fixture tests were extended; XML root selection fix applied for declarations/processing instructions.
+```sh
+npm run check:ci
+npm run check:deno
+npm run check:bun
+```
 
-## Toolchain
-- Pins are in `.tool-versions` (Node 24+, Deno, Bun). CI reads the same pins.
+`check:ci` runs the coverage thresholds, a high-severity npm audit, and an npm package allowlist check. Deno and Bun checks validate the portable extraction path; Node-only CLI process tests are skipped there.
 
-## Runtime Parity
-- Mandate: remove Playwright and pdftotext to enable Node/Deno/Bun parity.
-- Non-goals: dynamic JS execution or headless browser rendering.
-- HTML extraction defaults to parser-stack (`@ismail-elkorchi/html-parser` + `@ismail-elkorchi/css-parser`).
-- HTML extraction uses a single engine path (parser-stack only).
-- Episteme verifies parser-stack artifacts with `prepare:parser-stack` before runtime parity checks. Source builds are opt-in for local parser development only.
-- PDF extraction uses pdfjs-dist instead of pdftotext.
-- Deno/Bun test commands use --node-modules-dir.
+Use synthetic fixtures whenever possible. Do not commit raw third-party web content.
 
-## Decision Rationale Summary
-- Parity favors a single JS-only path over runtime-specific adapters.
-- Schema stays aligned with extractor output.
-- Consumer surface is enforced via npm files and checks.
-- Distribution stays scoped to `@ismail-elkorchi/episteme`.
+## Dependencies
 
-## Decision Rationale
+Dependency updates are curated rather than automated. Review `npm outdated`, update related parser packages together when their APIs change, regenerate `package-lock.json`, and run all verification commands above.
 
-### Runtime Parity (HTML/PDF)
-- Candidate methods: keep Playwright + pdftotext (Node-only), use parser-stack + pdfjs-dist, add runtime-specific adapters, or drop HTML/PDF parity.
-- Mapping: Node-only fails parity; parser-stack + JS PDF provides a single cross-runtime path; adapters increase drift risk; dropping parity violates consumer requirements.
+## Releases
 
-### Schema Alignment
-- Candidate methods: leave schema unchanged, update title + add fragment, remove schema, or mark schema as deprecated.
-- Mapping: unchanged keeps mismatch; update aligns with output; remove loses contract; deprecate increases ambiguity.
+The sole package target is the public npm package `episteme`. The `files` allowlist in `package.json` defines its consumer surface.
 
-### Consumer Surface Separation
-- Candidate methods: npm files + .npmignore + jsr excludes, monorepo split, postpublish scrub, or mirror repo.
-- Mapping: files/excludes constrain surface; monorepo adds overhead; postpublish is fragile; mirror increases duplication and drift.
+To release:
 
-### Distribution Scope
-- Candidate methods: keep unscoped, scope to @ismail-elkorchi/episteme, publish separate names, or avoid publishing.
-- Mapping: unscoped conflicts with publishing plan; scoped matches target; separate names fragment; avoid publishing conflicts with distribution requirement.
+1. Update `package.json` and `package-lock.json` to the same version.
+2. Merge a PR with all release gates passing.
+3. Push the matching `v<version>` tag.
 
-## Distribution
-- Mandate: package name and metadata must reflect publishing scope and GitHub repository.
-- Non-goals: change CLI name or public command semantics.
-- Package metadata must match GitHub repo and scope.
-- Selection: scope to @ismail-elkorchi/episteme; trade-offs are minimal and limited to updated install commands.
-- Packaging checks use scripts/verify-package.mjs.
-
-## Holdout
-- Holdout schema fixture for regression checks lives under `tests/fixtures/holdout/`.
-
-## Evidence
-- Runtime parity: src/extractors/html.js, src/extractors/pdf.js, src/pipeline/extract.js, tests/ (xml/html/pdf).
-- Schema alignment: schema/document.schema.json, src/pipeline/extract.js.
-- Consumer surface separation: scripts/verify-package.mjs, package.json files list.
-- Distribution scope: package.json, jsr.json, README.md.
-
-## Backlog
-- Validate CI runs on Node/Deno/Bun for this repo.
-- Add manual-ingest refresh tests (changed/unchanged files).
-- Add dry-run reporting for refresh.
-- Add annotation/appinfo extraction tests.
-- Sample-check extracted XSD element list against the source XSD.
-- Add unit tests for element/complexType/simpleType parsing.
-- Compare extracted element/type counts against the source XSD.
-- Add tests for annotation and facet extraction.
-- Compare extracted facets against a known schema instance for coverage.
-- Add unit tests for facet and assertion extraction.
-- Add XML/XSD parsing tests against additional real schemas.
-- Add deep constraint modeling for XSD constraints (requires new sources).
-- Improve HTML extraction for W3C specs with structured headings.
-- Add structured output for annotation/appinfo blocks.
-- Add non-W3C XSD fixture.
-- Run parity diff on real HTML/PDF snapshots.
-- Validate PDF extraction on a real spec PDF per runtime.
-- Integrate optional CLI schema validation.
-- Run npm audit and triage high-severity issues.
-- Run full pipeline under Deno/Bun for parity.
-- Add schema-aware XML validation.
-- Improve PDF structure recovery.
+The release workflow validates the tag, checks that the npm version is new, publishes with npm trusted publishing and provenance, and creates a GitHub release. The repository must be configured as a trusted publisher for `episteme`; no long-lived npm token is used.

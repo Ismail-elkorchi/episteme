@@ -1,7 +1,5 @@
 # Episteme
 
-Back to [docs/INDEX.md](docs/INDEX.md).
-
 Episteme is a deterministic CLI that snapshots sources and extracts structured, provenance-preserving documents.
 It is built for consumers who need reliable external knowledge for their own projects.
 
@@ -53,8 +51,8 @@ Optional:
 
 ## Quick Start
 ```sh
-npm install @ismail-elkorchi/episteme
-npx @ismail-elkorchi/episteme pipeline --manifest ./manifest.json
+npm install episteme
+npx episteme pipeline --manifest ./manifest.json
 ```
 
 The published package already depends on the published parser stack packages.
@@ -72,7 +70,7 @@ You do not need to install `@ismail-elkorchi/html-parser`, `@ismail-elkorchi/css
 
 ## Deno/Bun Usage
 ```sh
-deno run --allow-read --allow-write --allow-net --node-modules-dir src/cli.js pipeline --manifest ./manifest.json
+deno run --allow-read --allow-write --allow-net --node-modules-dir=manual src/cli.js pipeline --manifest ./manifest.json
 bun src/cli.js pipeline --manifest ./manifest.json
 ```
 
@@ -105,7 +103,4 @@ Optional:
 
 ## Compatibility
 - Full pipeline (HTML + PDF): Node.js 24+ (LTS), latest stable Deno, or latest stable Bun.
-- Local parser repo overrides are a contributor workflow only. The default runtime path uses the published scoped parser packages.
-
-## Incident Reporting
-- Parser-layer incident routing and required reproducibility fields: `docs/PARSER_INCIDENT_HANDOFF.md`.
+- The HTML and XML engines use the published parser dependencies included by npm.
