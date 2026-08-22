@@ -1,5 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  disposeResponseBody,
+  NodeHttpClient,
+  readResponseBody,
+} from "@ismail-elkorchi/http-client";
 import { ARTIFACT_SCHEMA_VERSION } from "../constants.js";
 import { cancelledError, inputError, limitError, throwIfAborted, unavailableError } from "../errors.js";
 import { writeFileAtomic } from "../execution.js";
@@ -18,9 +23,64 @@ import {
 
 const INDEX_FILE = "index.json";
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
+const RETRYABLE_TRANSPORT_FAILURES = new Set([
+  "CONNECT_TIMEOUT",
+  "DNS_ERROR",
+  "NETWORK_FAILURE",
+  "RESPONSE_BODY_TIMEOUT",
+  "RESPONSE_FIELDS_TIMEOUT",
+  "TLS_ERROR",
+  "TOTAL_TIMEOUT",
+]);
+const RESPONSE_LIMIT_FAILURES = new Set([
+  "DECODED_RESPONSE_TOO_LARGE",
+  "WIRE_RESPONSE_TOO_LARGE",
+]);
 const SHA256_PATTERN = /^[a-f0-9]{64}$/u;
 
-export async function snapshotAll({
+export async function snapshotAll(options) {
+  const timeoutMs = options.timeoutMs ?? 60_000;
+  const maxBytes = options.maxBytes ?? 25 * 1024 * 1024;
+  const client = new NodeHttpClient({
+    defaultFields: [
+      { name: "user-agent", value: "episteme/0.1 (snapshot)" },
+      {
+        name: "accept",
+        value: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+    ],
+    maxRedirects: 10,
+    networkSafety: {
+      allowLocalhost: options.allowLocalhost ?? false,
+      allowPrivateNetworks: options.allowPrivateNetworks ?? false,
+    },
+    responseStorage: {
+      memoryThresholdBytes: maxBytes,
+    },
+    responseTransferLimits: {
+      maxWireBytes: maxBytes,
+      maxDecodedBytes: maxBytes,
+    },
+    timeouts: {
+      totalMs: timeoutMs,
+      connectMs: timeoutMs,
+      responseFieldsMs: timeoutMs,
+      responseBodyProgressMs: null,
+    },
+  });
+  try {
+    return await snapshotAllWithClient({
+      ...options,
+      timeoutMs,
+      maxBytes,
+      client,
+    });
+  } finally {
+    await client.close();
+  }
+}
+
+async function snapshotAllWithClient({
   manifest,
   outDir,
   reuseExisting = false,
@@ -29,6 +89,7 @@ export async function snapshotAll({
   retries = 2,
   signal,
   onProgress = () => {},
+  client,
 }) {
   const indexPath = path.join(outDir, INDEX_FILE);
   const index = await readSnapshotIndex(indexPath);
@@ -85,7 +146,7 @@ export async function snapshotAll({
           lastModified: existing.lastModified ?? previousMeta.lastModified,
         }
       : null;
-    const captured = await snapshotUrl(url, outDir, {
+    const captured = await captureSnapshot(client, url, outDir, {
       timeoutMs,
       maxBytes,
       retries,
@@ -130,7 +191,7 @@ export async function snapshotAll({
   };
 }
 
-export async function snapshotUrl(url, outDir, {
+async function captureSnapshot(client, url, outDir, {
   timeoutMs = 60_000,
   maxBytes = 25 * 1024 * 1024,
   retries = 2,
@@ -140,26 +201,23 @@ export async function snapshotUrl(url, outDir, {
 } = {}) {
   throwIfAborted(signal);
   const normalizedUrl = normalizeUrlForSnapshot(url);
-  const headers = {
-    "User-Agent": "episteme/0.1 (snapshot)",
-    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  };
+  const fields = [];
   if (previous?.etag) {
-    headers["If-None-Match"] = previous.etag;
+    fields.push({ name: "if-none-match", value: previous.etag });
   } else if (previous?.lastModified) {
-    headers["If-Modified-Since"] = previous.lastModified;
+    fields.push({ name: "if-modified-since", value: previous.lastModified });
   }
 
-  const request = await fetchWithRetries(normalizedUrl, {
-    headers,
+  const response = await fetchWithRetries(client, normalizedUrl, {
+    fields,
     timeoutMs,
+    maxBytes,
     retries,
     signal,
     onProgress,
   });
   try {
-    const { response } = request;
-    if (response.status === 304) {
+    if (response.statusCode === 304) {
       if (!previous?.snapshotId) {
         throw unavailableError(`Source returned 304 without a recorded snapshot: ${normalizedUrl}`, {
           url: normalizedUrl,
@@ -177,23 +235,23 @@ export async function snapshotUrl(url, outDir, {
         status: "unchanged",
         meta: recorded.meta,
         validators: {
-          etag: response.headers.get("etag") || previous.etag || recorded.meta.etag || null,
-          lastModified: response.headers.get("last-modified") || previous.lastModified || recorded.meta.lastModified || null,
+          etag: response.fields.first("etag") || previous.etag || recorded.meta.etag || null,
+          lastModified: response.fields.first("last-modified") || previous.lastModified || recorded.meta.lastModified || null,
         },
       };
     }
-    if (!response.ok) {
-      throw unavailableError(`Snapshot failed with HTTP ${response.status}: ${normalizedUrl}`, {
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw unavailableError(`Snapshot failed with HTTP ${response.statusCode}: ${normalizedUrl}`, {
         url: normalizedUrl,
-        status: response.status,
+        status: response.statusCode,
       });
     }
 
-    const contentType = response.headers.get("content-type") || "application/octet-stream";
-    const buffer = await readBoundedBody(response, maxBytes, normalizedUrl);
+    const contentType = response.fields.first("content-type") || "application/octet-stream";
+    const buffer = Buffer.from(await readResponseBody(response.body));
     const representation = {
       sourceUrl: normalizedUrl,
-      finalUrl: response.url,
+      finalUrl: response.finalUrl,
       contentType,
       charset: parseCharset(contentType) || null,
       bytes: buffer.byteLength,
@@ -203,8 +261,8 @@ export async function snapshotUrl(url, outDir, {
     const snapshotDir = path.join(outDir, snapshotId);
     const existingMeta = await readJson(path.join(snapshotDir, "meta.json"), null);
     const validators = {
-      etag: response.headers.get("etag") || null,
-      lastModified: response.headers.get("last-modified") || null,
+      etag: response.fields.first("etag") || null,
+      lastModified: response.fields.first("last-modified") || null,
     };
     if (existingMeta) {
       const existingSnapshot = await loadSnapshotContent(outDir, snapshotId);
@@ -224,14 +282,8 @@ export async function snapshotUrl(url, outDir, {
     await writeFileAtomic(path.join(snapshotDir, fileName), buffer);
     await writeJson(path.join(snapshotDir, "meta.json"), meta);
     return { status: "captured", meta, validators };
-  } catch (error) {
-    throwIfAborted(signal);
-    if (error?.name === "AbortError") {
-      throw unavailableError(`Snapshot timed out: ${normalizedUrl}`, { url: normalizedUrl }, error);
-    }
-    throw error;
   } finally {
-    request.stopTimeout();
+    await disposeResponseBody(response.body);
   }
 }
 
@@ -314,99 +366,103 @@ function snapshotIdentity(meta) {
   };
 }
 
-async function fetchWithRetries(url, { headers, timeoutMs, retries, signal, onProgress }) {
-  let lastError;
+async function fetchWithRetries(client, url, {
+  fields,
+  timeoutMs,
+  maxBytes,
+  retries,
+  signal,
+  onProgress,
+}) {
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     throwIfAborted(signal);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-    const cancel = () => controller.abort(signal.reason);
-    signal?.addEventListener("abort", cancel, { once: true });
-    const stop = () => {
-      clearTimeout(timeout);
-      signal?.removeEventListener("abort", cancel);
-    };
-    try {
-      const response = await fetch(url, {
-        signal: controller.signal,
-        redirect: "follow",
-        headers,
-      });
-      if (!RETRYABLE_STATUSES.has(response.status) || attempt === retries) {
-        return { response, stopTimeout: stop };
+    const result = await client.fetchBuffered(url, {
+      fields,
+      signal,
+      timeouts: {
+        totalMs: timeoutMs,
+        responseFieldsMs: timeoutMs,
+        responseBodyProgressMs: null,
+      },
+      responseTransferLimits: {
+        maxWireBytes: maxBytes,
+        maxDecodedBytes: maxBytes,
+      },
+      responseStorage: {
+        memoryThresholdBytes: maxBytes,
+      },
+    });
+    throwIfAborted(signal);
+
+    if (result.kind === "response") {
+      if (!RETRYABLE_STATUSES.has(result.statusCode) || attempt === retries) {
+        return result;
       }
-      await response.body?.cancel();
-      stop();
+      await disposeResponseBody(result.body);
       onProgress({
         stage: "snapshot",
-        message: `Retrying ${url} after HTTP ${response.status}`,
+        message: `Retrying ${url} after HTTP ${result.statusCode}`,
         current: attempt + 1,
         total: retries + 1,
         status: "retrying",
       });
-      await delay(retryDelayMs(response, attempt), signal);
-    } catch (error) {
-      lastError = error;
-      stop();
-      throwIfAborted(signal);
-      if (attempt === retries) {
-        const reason = error?.name === "AbortError" ? "timed out" : "failed";
-        throw unavailableError(`Snapshot ${reason}: ${url}`, { url, attempts: attempt + 1 }, error);
-      }
-      onProgress({
-        stage: "snapshot",
-        message: `Retrying ${url} after a transport failure`,
-        current: attempt + 1,
-        total: retries + 1,
-        status: "retrying",
-      });
-      await delay(Math.min(250 * 2 ** attempt, 5_000), signal);
+      await delay(retryDelayMs(result.fields, attempt), signal);
+      continue;
     }
+
+    const mapped = snapshotTransportError(result, url, maxBytes, signal);
+    if (
+      attempt === retries ||
+      !RETRYABLE_TRANSPORT_FAILURES.has(result.error.code)
+    ) {
+      throw mapped;
+    }
+    onProgress({
+      stage: "snapshot",
+      message: `Retrying ${url} after a transport failure`,
+      current: attempt + 1,
+      total: retries + 1,
+      status: "retrying",
+    });
+    await delay(Math.min(250 * 2 ** attempt, 5_000), signal);
   }
-  throw unavailableError(`Snapshot failed: ${url}`, { url }, lastError);
+  throw unavailableError(`Snapshot failed: ${url}`, { url });
 }
 
-async function readBoundedBody(response, maxBytes, url) {
-  const declaredLength = Number(response.headers.get("content-length"));
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
-    await response.body?.cancel();
-    throw limitError(`Source exceeds the ${maxBytes}-byte response limit: ${url}`, {
+function snapshotTransportError(result, url, maxBytes, signal) {
+  throwIfAborted(signal);
+  const { code, message } = result.error;
+  if (RESPONSE_LIMIT_FAILURES.has(code)) {
+    const attempt = result.attempts.at(-1);
+    return limitError(`Source exceeds the ${maxBytes}-byte response limit: ${url}`, {
       url,
-      declaredBytes: declaredLength,
+      kind: code === "WIRE_RESPONSE_TOO_LARGE" ? "wire" : "decoded",
+      observedBytes: code === "WIRE_RESPONSE_TOO_LARGE"
+        ? attempt?.transfer?.wireBytesReceived ?? null
+        : attempt?.transfer?.decodedBytesReceived ?? null,
       limit: maxBytes,
     });
   }
-  if (!response.body) {
-    return Buffer.alloc(0);
+  if (
+    code === "INVALID_URL" ||
+    code === "NETWORK_SAFETY_REJECTED" ||
+    code === "UNSUPPORTED_PROTOCOL"
+  ) {
+    return inputError(`Snapshot target rejected: ${url}`, {
+      url,
+      transportCode: code,
+      reason: message,
+    });
   }
-  const reader = response.body.getReader();
-  const chunks = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
-        throw limitError(`Source exceeds the ${maxBytes}-byte response limit: ${url}`, {
-          url,
-          observedBytes: total,
-          limit: maxBytes,
-        });
-      }
-      chunks.push(Buffer.from(value));
-    }
-  } catch (error) {
-    await reader.cancel(error).catch(() => {});
-    throw error;
-  } finally {
-    reader.releaseLock();
-  }
-  return Buffer.concat(chunks, total);
+  return unavailableError(`Snapshot failed: ${url}`, {
+    url,
+    transportCode: code,
+    reason: message,
+  }, result.error);
 }
 
-function retryDelayMs(response, attempt) {
-  const retryAfter = response.headers.get("retry-after");
+function retryDelayMs(fields, attempt) {
+  const retryAfter = fields.first("retry-after");
   if (retryAfter && /^\d+$/u.test(retryAfter)) {
     return Math.min(Number(retryAfter) * 1_000, 30_000);
   }

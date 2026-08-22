@@ -5,7 +5,20 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { loadSnapshotContent, snapshotUrl } from "../src/pipeline/snapshot.js";
+import { gzipSync } from "node:zlib";
+import { loadSnapshotContent, snapshotAll } from "../src/pipeline/snapshot.js";
+
+async function captureOne(url, outDir, options = {}) {
+  const result = await snapshotAll({
+    manifest: [{ url }],
+    outDir,
+    allowLocalhost: options.allowLocalhost ?? true,
+    ...options,
+  });
+  const source = result.sources[0];
+  const snapshot = await loadSnapshotContent(outDir, source.snapshotId);
+  return { status: source.status, meta: snapshot.meta };
+}
 
 test("snapshots redirects and records response metadata", async (t) => {
   const outDir = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-snapshot-"));
@@ -36,7 +49,7 @@ test("snapshots redirects and records response metadata", async (t) => {
 
   const address = server.address();
   const sourceUrl = `http://127.0.0.1:${address.port}/redirect`;
-  const first = await snapshotUrl(sourceUrl, outDir, { timeoutMs: 2_000, retries: 0 });
+  const first = await captureOne(sourceUrl, outDir, { timeoutMs: 2_000, retries: 0 });
   const meta = first.meta;
   assert.equal(first.status, "captured");
   assert.equal(meta.sourceUrl, sourceUrl);
@@ -48,10 +61,9 @@ test("snapshots redirects and records response metadata", async (t) => {
   const snapshot = await loadSnapshotContent(outDir, meta.snapshotId);
   assert.equal(snapshot.buffer.toString("utf8"), "snapshot body");
 
-  const second = await snapshotUrl(sourceUrl, outDir, {
+  const second = await captureOne(sourceUrl, outDir, {
     timeoutMs: 2_000,
     retries: 0,
-    previous: meta,
   });
   assert.equal(second.status, "unchanged");
   assert.equal(second.meta.snapshotId, meta.snapshotId);
@@ -77,7 +89,7 @@ test("retries bounded transient failures", async (t) => {
   t.after(() => new Promise((resolve) => server.close(resolve)));
 
   const address = server.address();
-  const captured = await snapshotUrl(`http://127.0.0.1:${address.port}/eventual`, outDir, {
+  const captured = await captureOne(`http://127.0.0.1:${address.port}/eventual`, outDir, {
     timeoutMs: 2_000,
     retries: 1,
   });
@@ -99,7 +111,7 @@ test("rejects unsuccessful snapshot responses", async (t) => {
 
   const address = server.address();
   await assert.rejects(
-    snapshotUrl(`http://127.0.0.1:${address.port}/failure`, outDir, {
+    captureOne(`http://127.0.0.1:${address.port}/failure`, outDir, {
       timeoutMs: 2_000,
       retries: 0,
     }),
@@ -119,12 +131,38 @@ test("enforces the response byte limit while streaming", async (t) => {
   t.after(() => new Promise((resolve) => server.close(resolve)));
   const address = server.address();
   await assert.rejects(
-    snapshotUrl(`http://127.0.0.1:${address.port}/large`, outDir, {
+    captureOne(`http://127.0.0.1:${address.port}/large`, outDir, {
       timeoutMs: 2_000,
       retries: 0,
       maxBytes: 5,
     }),
     (error) => error.code === "LIMIT_EXCEEDED",
+  );
+});
+
+test("enforces the decoded response limit", async (t) => {
+  const outDir = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-snapshot-decoded-limit-"));
+  t.after(() => fs.rm(outDir, { recursive: true, force: true }));
+  const compressed = gzipSync(Buffer.alloc(4_096, 97));
+  const server = http.createServer((_request, response) => {
+    response.writeHead(200, {
+      "content-encoding": "gzip",
+      "content-type": "text/plain",
+    });
+    response.end(compressed);
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const address = server.address();
+
+  await assert.rejects(
+    captureOne(`http://127.0.0.1:${address.port}/compressed`, outDir, {
+      timeoutMs: 2_000,
+      retries: 0,
+      maxBytes: 1_024,
+    }),
+    (error) => error.code === "LIMIT_EXCEEDED" && error.details?.kind === "decoded",
   );
 });
 
@@ -143,10 +181,36 @@ test("applies the request timeout while streaming the body", async (t) => {
   const address = server.address();
 
   await assert.rejects(
-    snapshotUrl(`http://127.0.0.1:${address.port}/slow`, outDir, {
+    captureOne(`http://127.0.0.1:${address.port}/slow`, outDir, {
       timeoutMs: 25,
       retries: 0,
     }),
     (error) => error.code === "SOURCE_UNAVAILABLE" && error.retryable === true,
   );
+});
+
+test("rejects localhost by default and admits it only by explicit policy", async (t) => {
+  const outDir = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-snapshot-policy-"));
+  t.after(() => fs.rm(outDir, { recursive: true, force: true }));
+  let requests = 0;
+  const server = http.createServer((_request, response) => {
+    requests += 1;
+    response.end("allowed");
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const address = server.address();
+  const url = `http://127.0.0.1:${address.port}/policy`;
+
+  await assert.rejects(
+    snapshotAll({ manifest: [{ url }], outDir, retries: 0 }),
+    (error) => error.code === "INVALID_INPUT" &&
+      error.details?.transportCode === "NETWORK_SAFETY_REJECTED",
+  );
+  assert.equal(requests, 0);
+
+  const captured = await captureOne(url, outDir, { retries: 0 });
+  assert.equal(captured.status, "captured");
+  assert.equal(requests, 1);
 });

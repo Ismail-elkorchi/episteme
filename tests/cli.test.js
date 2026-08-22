@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { assertArtifact, assertCliEnvelope } from "./helpers/schema-validator.js";
 
-const isNode = typeof globalThis.Deno === "undefined" && typeof globalThis.Bun === "undefined";
+const isNode = typeof globalThis.Deno === "undefined";
 const repositoryRoot = path.dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 const cliPath = path.join(repositoryRoot, "src", "cli.js");
 
@@ -114,6 +114,11 @@ test("validates typed options, stdout artifacts, and progress mode before work",
   const invalidProgress = runCli(["--progress=occasionally", "query", "--term", "evidence"]);
   assert.equal(invalidProgress.status, 2);
   assert.match(invalidProgress.stderr, /auto, always, never/u);
+
+  const networkHelp = runCli(["snapshot", "--help"]);
+  assert.equal(networkHelp.status, 0);
+  assert.match(networkHelp.stdout, /--allow-localhost/u);
+  assert.match(networkHelp.stdout, /--allow-private-networks/u);
 });
 
 test("runs the successful agent workflow through the executable", { skip: !isNode }, async (t) => {

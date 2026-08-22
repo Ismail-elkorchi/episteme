@@ -65,6 +65,8 @@ history. The initial `fetchedAt` is retained as legitimate observation evidence.
 HTTP capture:
 
 - Enforces per-request timeout and body-size limits.
+- Rejects localhost, private-use, and other non-public network targets unless the invocation
+  explicitly admits localhost or private-use networks.
 - Uses ETag or Last-Modified validators when a recorded source provides them.
 - Handles `304 Not Modified` without creating a snapshot.
 - Retries only bounded transient HTTP statuses and transport failures.

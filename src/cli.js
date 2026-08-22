@@ -100,6 +100,8 @@ async function runSnapshot(options, context) {
     timeoutMs: options.timeout,
     maxBytes: options.maxBytes,
     retries: options.retries,
+    allowLocalhost: options.allowLocalhost,
+    allowPrivateNetworks: options.allowPrivateNetworks,
     ...context,
   });
   return { data };
@@ -203,6 +205,8 @@ async function runPipeline(options, context) {
     timeoutMs: options.timeout,
     maxBytes: options.maxBytes,
     retries: options.retries,
+    allowLocalhost: options.allowLocalhost,
+    allowPrivateNetworks: options.allowPrivateNetworks,
     ...context,
   });
   context.onProgress({ stage: "pipeline", message: "Extracting documents", status: "started" });

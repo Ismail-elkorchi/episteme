@@ -38,7 +38,6 @@ jobs:
         run: |
           echo "node=$(awk '/^nodejs /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
           echo "deno=$(awk '/^deno /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
-          echo "bun=$(awk '/^bun /{print $2}' .tool-versions)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -51,11 +50,6 @@ jobs:
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: ${{ steps.toolversions.outputs.deno }}
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: ${{ steps.toolversions.outputs.bun }}
 
       - name: Resolve and verify release metadata
         id: meta
@@ -127,7 +121,6 @@ jobs:
           set -euo pipefail
           npm run check:ci
           npm run check:deno
-          npm run check:bun
           npm run package:check:jsr
 
       - name: Inspect registry versions

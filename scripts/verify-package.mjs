@@ -19,6 +19,13 @@ const expectedJsrIncludes = [
   "src/**/*.d.ts",
   "src/**/*.js",
 ];
+const expectedJsrImports = {
+  "@ismail-elkorchi/http-client": "jsr:@ismail-elkorchi/http-client@0.1.1",
+};
+const expectedMinimumDependencyAge = {
+  age: "P1D",
+  exclude: ["jsr:@ismail-elkorchi/http-client"],
+};
 
 function fail(message) {
   console.error(message);
@@ -80,6 +87,17 @@ function checkJsrPackage() {
   }
   if (Object.keys(jsr.exports || {}).length !== 1 || jsr.exports?.["./cli"] !== "./src/cli.js") {
     fail("JSR package must expose only the explicit ./cli entrypoint");
+  }
+  if (JSON.stringify(jsr.imports) !== JSON.stringify(expectedJsrImports)) {
+    fail(`unexpected JSR imports: ${JSON.stringify(jsr.imports)}`);
+  }
+  if (
+    JSON.stringify(jsr.minimumDependencyAge) !==
+      JSON.stringify(expectedMinimumDependencyAge)
+  ) {
+    fail(
+      `unexpected JSR minimum dependency age: ${JSON.stringify(jsr.minimumDependencyAge)}`,
+    );
   }
   const includes = jsr.publish?.include;
   if (!Array.isArray(includes) || !sameStringSet(includes, expectedJsrIncludes)) {

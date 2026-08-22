@@ -29,6 +29,14 @@ export const COMMANDS = Object.freeze({
       manifest: pathOption("Source manifest JSON file, or - for stdin.", "manifest.json"),
       out: pathOption("Snapshot directory.", "snapshots"),
       reuse: booleanOption("Use recorded snapshots without network requests."),
+      "allow-localhost": {
+        ...booleanOption("Allow loopback and localhost snapshot targets."),
+        key: "allowLocalhost",
+      },
+      "allow-private-networks": {
+        ...booleanOption("Allow private-use network targets; localhost remains separate."),
+        key: "allowPrivateNetworks",
+      },
       timeout: integerOption("Per-request timeout in milliseconds.", 60_000, 1, 600_000),
       "max-bytes": {
         ...integerOption("Maximum response bytes per source.", 25 * 1024 * 1024, 1, 1024 * 1024 * 1024),
@@ -157,6 +165,14 @@ export const COMMANDS = Object.freeze({
       specs: pathOption("Extracted-document directory.", "specs"),
       chunks: pathOption("Chunk directory.", "chunks"),
       reuse: booleanOption("Use recorded snapshots without network requests."),
+      "allow-localhost": {
+        ...booleanOption("Allow loopback and localhost snapshot targets."),
+        key: "allowLocalhost",
+      },
+      "allow-private-networks": {
+        ...booleanOption("Allow private-use network targets; localhost remains separate."),
+        key: "allowPrivateNetworks",
+      },
       timeout: integerOption("Per-request timeout in milliseconds.", 60_000, 1, 600_000),
       "max-bytes": {
         ...integerOption("Maximum response bytes per source.", 25 * 1024 * 1024, 1, 1024 * 1024 * 1024),
