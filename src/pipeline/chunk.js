@@ -16,7 +16,7 @@ export async function chunkAll({ inputDir, outDir }) {
   for (const doc of documents) {
     const docId = sanitizeUrlToId(doc.url);
     const family = doc.family || "generic";
-    const baseDir = path.join(outDir, family);
+    const baseDir = path.join(outDir, safeFamilyDirectoryName(family));
     await fs.mkdir(baseDir, { recursive: true });
 
     for (const [sectionIndex, section] of doc.sections.entries()) {
@@ -82,6 +82,14 @@ export async function chunkAll({ inputDir, outDir }) {
     generatedAt: new Date().toISOString(),
     chunks: chunkIndex,
   });
+}
+
+function safeFamilyDirectoryName(family) {
+  const value = String(family || "generic");
+  if (/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(value)) {
+    return value;
+  }
+  return `family-${sha256Hex(Buffer.from(value, "utf8"))}`;
 }
 
 function flattenBlock(block) {

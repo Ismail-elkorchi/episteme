@@ -8,6 +8,7 @@ async function testExtractedIdsCannotControlOutputPaths() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-chunk-path-"));
   const inputDir = path.join(root, "input");
   const outDir = path.join(root, "out");
+  const hostileFamily = "../escaped-family";
 
   try {
     await fs.mkdir(inputDir);
@@ -15,7 +16,7 @@ async function testExtractedIdsCannotControlOutputPaths() {
       path.join(inputDir, "document.json"),
       JSON.stringify({
         url: "https://example.test/document",
-        family: "generic",
+        family: hostileFamily,
         sections: [
           {
             id: "../../../hostile-section",
@@ -37,16 +38,18 @@ async function testExtractedIdsCannotControlOutputPaths() {
 
     const index = JSON.parse(await fs.readFile(path.join(outDir, "index.json"), "utf8"));
     assert.equal(index.chunks.length, 1);
+    assert.equal(index.chunks[0].family, hostileFamily);
 
     const relativePath = index.chunks[0].path;
-    assert.equal(relativePath.startsWith(`generic${path.sep}`), true);
+    assert.equal(relativePath.startsWith(`family-`), true);
     assert.equal(relativePath.includes(".."), false);
 
     const resolvedOutput = path.resolve(outDir, relativePath);
-    const resolvedFamilyDir = `${path.resolve(outDir, "generic")}${path.sep}`;
-    assert.equal(resolvedOutput.startsWith(resolvedFamilyDir), true);
+    const resolvedOutDir = `${path.resolve(outDir)}${path.sep}`;
+    assert.equal(resolvedOutput.startsWith(resolvedOutDir), true);
     assert.equal(JSON.parse(await fs.readFile(resolvedOutput, "utf8")).text.includes("payload"), true);
 
+    await assert.rejects(fs.access(path.join(root, "escaped-family")));
     await assert.rejects(fs.access(path.join(outDir, "escaped.json")));
   } finally {
     await fs.rm(root, { recursive: true, force: true });
