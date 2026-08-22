@@ -11,9 +11,17 @@ function normalizeAttributes(attributes) {
     return [];
   }
   return attributes
-    .filter((attribute) => attribute && typeof attribute.name === "string")
+    .filter(
+      (attribute) =>
+        attribute &&
+        (typeof attribute.name === "string" || typeof attribute.localName === "string"),
+    )
     .map((attribute) => ({
-      name: String(attribute.name),
+      name: String(
+        attribute.name ||
+          (attribute.prefix ? `${attribute.prefix}:${attribute.localName}` : attribute.localName),
+      ),
+      namespace: attribute.namespaceUri || null,
       value: attribute.value == null ? "" : String(attribute.value),
     }));
 }
@@ -82,11 +90,13 @@ function findFirstByTagName(rootNode, tagName) {
 }
 
 class ParserElement {
-  constructor({ ownerDocument, tagName, attributes, parentElement }) {
+  constructor({ ownerDocument, tagName, namespaceUri, attributes, parentElement }) {
     this.kind = "element";
     this.type = "element";
     this.nodeType = 1;
     this.tagName = String(tagName || "").toUpperCase();
+    this.localName = String(tagName || "").toLowerCase();
+    this.namespaceUri = namespaceUri || null;
     this.attributes = normalizeAttributes(attributes);
     this._ownerDocument = ownerDocument;
     this._parentElement = parentElement;
@@ -196,6 +206,7 @@ class ParserDocument {
     this.type = "document";
     this.children = [];
     this._cssParser = cssParser;
+    this._selectorCache = new Map();
     this._title = "";
     this.body = null;
     this.location = { href: url || "" };
@@ -245,9 +256,16 @@ class ParserDocument {
       return [];
     }
     try {
-      const matches = Array.from(
-        this._cssParser.querySelectorAll(selector, rootNode, { strict: false }) || [],
+      const selectorList = this._parseSelector(selector);
+      if (!selectorList) {
+        return [];
+      }
+      const result = this._cssParser.querySelectorList(
+        selectorList,
+        rootNode,
+        this._selectorEnvironment(),
       );
+      const matches = Array.from(result.matches || []).filter(isElementNode);
       if (!includeRoot && matches[0] === rootNode) {
         return matches.slice(1);
       }
@@ -262,17 +280,87 @@ class ParserDocument {
       return false;
     }
     try {
-      return Boolean(this._cssParser.matchesSelector(selector, node, this, { strict: false }));
+      const selectorList = this._parseSelector(selector);
+      if (!selectorList) {
+        return false;
+      }
+      const result = this._cssParser.matchSelectorList(
+        selectorList,
+        node,
+        this,
+        this._selectorEnvironment(),
+        { scopes: new Set([node]) },
+      );
+      return result.status === "match";
     } catch (error) {
       return false;
     }
+  }
+
+  _parseSelector(selector) {
+    if (this._selectorCache.has(selector)) {
+      return this._selectorCache.get(selector);
+    }
+    const parsed = this._cssParser.parseSelectorList(selector);
+    const selectorList = parsed?.ok ? parsed.value : null;
+    this._selectorCache.set(selector, selectorList);
+    return selectorList;
+  }
+
+  _selectorEnvironment() {
+    return {
+      tree: {
+        data(node) {
+          if (!isElementNode(node)) {
+            return { kind: "other" };
+          }
+          return {
+            kind: "element",
+            namespace: node.namespaceUri,
+            localName: node.localName,
+            attributes: node.attributes.map((attribute) => ({
+              namespace: attribute.namespace,
+              localName: attribute.name,
+              value: attribute.value,
+            })),
+          };
+        },
+        children(node) {
+          return Array.isArray(node?.children) ? node.children : [];
+        },
+      },
+      documentMode: { syntax: "html", quirks: "no-quirks" },
+      defaultNamespace: { kind: "any" },
+      idValues(_node, element) {
+        const id = element.attributes.find(
+          (attribute) => attribute.namespace === null && attribute.localName === "id",
+        )?.value;
+        return id ? [id] : [];
+      },
+      classNames(_node, element) {
+        const value = element.attributes.find(
+          (attribute) => attribute.namespace === null && attribute.localName === "class",
+        )?.value;
+        return splitClassNames(value);
+      },
+      resolveNamespacePrefix() {
+        return { status: "unknown" };
+      },
+      attributeValueCaseSensitivity() {
+        return "sensitive";
+      },
+      matchPseudoClass() {
+        return "unknown";
+      },
+    };
   }
 }
 
 function buildElementTree(rawNode, ownerDocument, parentElement) {
   const element = new ParserElement({
     ownerDocument,
-    tagName: rawNode.tagName,
+    tagName: rawNode.tagName || rawNode.localName,
+    namespaceUri: rawNode.namespaceUri || null,
     attributes: rawNode.attributes,
     parentElement,
   });
@@ -313,14 +401,19 @@ function buildDocumentTree(parsedTree, cssParser, url) {
 
 function assertParserModules(modules) {
   const htmlParse = modules?.htmlParser?.parse;
-  const querySelectorAll = modules?.cssParser?.querySelectorAll;
-  const matchesSelector = modules?.cssParser?.matchesSelector;
+  const parseSelectorList = modules?.cssParser?.parseSelectorList;
+  const querySelectorList = modules?.cssParser?.querySelectorList;
+  const matchSelectorList = modules?.cssParser?.matchSelectorList;
   if (typeof htmlParse !== "function") {
     throw new Error("parser-stack html engine requires htmlParser.parse(html)");
   }
-  if (typeof querySelectorAll !== "function" || typeof matchesSelector !== "function") {
+  if (
+    typeof parseSelectorList !== "function" ||
+    typeof querySelectorList !== "function" ||
+    typeof matchSelectorList !== "function"
+  ) {
     throw new Error(
-      "parser-stack html engine requires cssParser.querySelectorAll(...) and cssParser.matchesSelector(...)",
+      "parser-stack html engine requires the CSS selector parse, query, and match APIs",
     );
   }
 }
@@ -331,7 +424,8 @@ export function createParserStackHtmlEngine({ htmlParser, cssParser }) {
   return defineHtmlEngine(
     {
       parse({ html, url }) {
-        const parsedTree = htmlParser.parse(html || "");
+        const parsed = htmlParser.parse(html || "");
+        const parsedTree = parsed?.tree || parsed;
         const document = buildDocumentTree(parsedTree, cssParser, url);
         return {
           document,

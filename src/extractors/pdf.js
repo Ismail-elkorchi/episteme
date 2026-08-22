@@ -1,6 +1,9 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { extractTextDocument } from "./text.js";
 
 let pdfJsModulePromise;
+let standardFontDataUrl;
 
 function ensurePdfJsCompatGlobals() {
   if (typeof globalThis.DOMMatrix === "undefined") {
@@ -44,6 +47,15 @@ async function loadPdfJs() {
   return pdfJsModulePromise;
 }
 
+function getStandardFontDataUrl() {
+  if (!standardFontDataUrl) {
+    const packageJsonUrl = import.meta.resolve("pdfjs-dist/package.json");
+    const packageDir = path.dirname(fileURLToPath(packageJsonUrl));
+    standardFontDataUrl = `${path.join(packageDir, "standard_fonts")}${path.sep}`;
+  }
+  return standardFontDataUrl;
+}
+
 function normalizePdfBytes(input) {
   if (!input) {
     throw new Error("PDF extraction requires binary data");
@@ -82,7 +94,11 @@ export async function extractPdfDocument({
   try {
     const data = normalizePdfBytes(buffer);
     const { getDocument } = await loadPdfJs();
-    const loadingTask = getDocument({ data, disableWorker: true });
+    const loadingTask = getDocument({
+      data,
+      disableWorker: true,
+      standardFontDataUrl: getStandardFontDataUrl(),
+    });
     const pdf = await loadingTask.promise;
     let text = "";
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
