@@ -1,12 +1,9 @@
 changelog:
-  exclude:
-    labels:
-      - skip-changelog
-      - chore
-      - internal
-      - dependencies
-      - github_actions
   categories:
+    - title: Breaking changes
+      labels:
+        - breaking-change
+        - semver-major
     - title: Features
       labels:
         - feature
@@ -24,3 +21,10 @@ changelog:
         - maintenance
         - refactor
         - docs
+    - title: Dependencies and automation
+      labels:
+        - dependencies
+        - github_actions
+    - title: Other merged pull requests
+      labels:
+        - "*"

@@ -52,6 +52,14 @@ npx episteme query --index ./chunks/search-index.json --term "popover algorithm"
 
 The parser and PDF-engine dependencies are included by the package.
 
+The same CLI is published to JSR as `@ismail-elkorchi/episteme`. Its entrypoint is named
+`./cli` so importing the package cannot accidentally execute a command:
+
+```sh
+deno run --allow-read --allow-write --allow-net --allow-env \
+  jsr:@ismail-elkorchi/episteme/cli --help
+```
+
 ## Manifest
 
 The manifest is a strict JSON array. Unknown fields, invalid values, duplicate URLs, and

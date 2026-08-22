@@ -2,12 +2,22 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { EPISTEME_VERSION } from "../src/constants.js";
 
+const EXPECTED_NPM_NAME = "episteme";
+const EXPECTED_JSR_NAME = "@ismail-elkorchi/episteme";
 const allowedPackPrefixes = [
   "package.json",
   "README.md",
   "LICENSE",
   "schema/",
   "src/",
+];
+const expectedJsrIncludes = [
+  "LICENSE",
+  "README.md",
+  "package.json",
+  "schema/**/*.json",
+  "src/**/*.d.ts",
+  "src/**/*.js",
 ];
 
 function fail(message) {
@@ -17,7 +27,7 @@ function fail(message) {
 
 function checkNpmPack() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
-  if (packageJson.name !== "episteme") {
+  if (packageJson.name !== EXPECTED_NPM_NAME) {
     fail(`unexpected npm package name: ${packageJson.name}`);
   }
   if (packageJson.version !== EPISTEME_VERSION) {
@@ -48,6 +58,7 @@ function checkNpmPack() {
     "schema/artifact.schema.json",
     "schema/cli-envelope.schema.json",
     "schema/document.schema.json",
+    "src/cli.d.ts",
     "src/cli.js",
   ]) {
     if (!files.includes(requiredFile)) {
@@ -56,5 +67,31 @@ function checkNpmPack() {
   }
 }
 
+function checkJsrPackage() {
+  const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+  const jsr = JSON.parse(readFileSync("jsr.json", "utf8"));
+  if (jsr.name !== EXPECTED_JSR_NAME) {
+    fail(`unexpected JSR package name: ${jsr.name}`);
+  }
+  if (jsr.version !== packageJson.version || jsr.version !== EPISTEME_VERSION) {
+    fail(
+      `JSR, npm, and runtime versions disagree: ${jsr.version} != ${packageJson.version} != ${EPISTEME_VERSION}`,
+    );
+  }
+  if (Object.keys(jsr.exports || {}).length !== 1 || jsr.exports?.["./cli"] !== "./src/cli.js") {
+    fail("JSR package must expose only the explicit ./cli entrypoint");
+  }
+  const includes = jsr.publish?.include;
+  if (!Array.isArray(includes) || !sameStringSet(includes, expectedJsrIncludes)) {
+    fail(`unexpected JSR publish allowlist: ${JSON.stringify(includes)}`);
+  }
+}
+
+function sameStringSet(left, right) {
+  return left.length === right.length && new Set(left).size === left.length &&
+    left.every((value) => right.includes(value));
+}
+
 checkNpmPack();
+checkJsrPackage();
 console.log("package checks passed");

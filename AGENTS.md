@@ -23,7 +23,7 @@ Repository guidance for contributors and coding agents.
 - Preserve human-readable default output, the opt-in `--json` envelope, and the `untrusted-source` boundary.
 - Reject invalid inputs explicitly; do not add artifact compatibility transforms.
 - Do not bypass access controls, CAPTCHA gates, or licensing constraints.
-- Keep the npm package limited to the CLI, runtime sources, schema, license, and README.
+- Keep the npm and JSR packages limited to the CLI, runtime sources, schema, license, and README.
 
 ## Required checks
 

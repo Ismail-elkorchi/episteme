@@ -1,0 +1,18 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@ismail-elkorchi/episteme",
+  "version": "0.1.0",
+  "exports": {
+    "./cli": "./src/cli.js"
+  },
+  "publish": {
+    "include": [
+      "LICENSE",
+      "README.md",
+      "package.json",
+      "schema/**/*.json",
+      "src/**/*.d.ts",
+      "src/**/*.js"
+    ]
+  }
+}
