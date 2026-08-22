@@ -18,7 +18,7 @@ export function extractTextDocument({
   }));
 
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url,
     title: title || url,
     family: family || "generic",

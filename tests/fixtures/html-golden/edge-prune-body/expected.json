@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2",
+  "schemaVersion": "0.1",
   "url": "https://example.test/edge-prune-body",
   "title": "Pruned Body",
   "family": "generic",

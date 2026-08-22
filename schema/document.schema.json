@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["schemaVersion", "url", "title", "family", "sections", "extractedAt"],
   "properties": {
-    "schemaVersion": { "type": "string" },
+    "schemaVersion": { "const": "0.1" },
     "url": { "type": "string" },
     "title": { "type": "string" },
     "family": { "type": "string" },
@@ -21,7 +21,12 @@
     "warnings": {
       "type": "array",
       "items": { "type": "string" }
-    }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/pdfDiagnostic" }
+    },
+    "pdf": { "$ref": "#/definitions/pdfExtraction" }
   },
   "definitions": {
     "source": {
@@ -77,7 +82,15 @@
           "type": "array",
           "items": { "$ref": "#/definitions/production" }
         },
-        "title": { "type": ["string", "null"] }
+        "title": { "type": ["string", "null"] },
+        "role": { "type": "string" },
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "heuristic": { "type": "string" },
+        "cells": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfTableCell" }
+        }
       }
     },
     "blockSource": {
@@ -85,7 +98,186 @@
       "properties": {
         "url": { "type": "string" },
         "fragment": { "type": ["string", "null"] },
-        "path": { "type": ["string", "null"] }
+        "path": { "type": ["string", "null"] },
+        "pageNumbers": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 },
+          "uniqueItems": true
+        },
+        "blockIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "runIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "citations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfCitation" }
+        }
+      }
+    },
+    "pdfExtraction": {
+      "type": "object",
+      "required": ["engine", "engineVersion", "status", "knownLimits", "findings", "forms"],
+      "properties": {
+        "engine": { "const": "@ismail-elkorchi/pdf-engine" },
+        "engineVersion": { "type": "string" },
+        "status": {
+          "enum": ["completed", "partial", "blocked", "failed", "cancelled"]
+        },
+        "pdfVersion": { "type": "string" },
+        "pageCount": { "type": "integer", "minimum": 0 },
+        "encrypted": { "type": "boolean" },
+        "repaired": { "type": "boolean" },
+        "strategy": { "type": "string" },
+        "knownLimits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfFinding" }
+        },
+        "forms": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfForm" }
+        }
+      }
+    },
+    "pdfDiagnostic": {
+      "type": "object",
+      "required": ["code", "stage", "level", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "stage": { "type": "string" },
+        "level": { "enum": ["low", "medium", "high", "critical"] },
+        "message": { "type": "string" },
+        "feature": { "type": "string" },
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "objectRef": { "$ref": "#/definitions/pdfObjectRef" },
+        "detail": { "type": "string" }
+      }
+    },
+    "pdfFinding": {
+      "type": "object",
+      "required": ["kind", "action", "evidenceSource", "message"],
+      "properties": {
+        "kind": { "type": "string" },
+        "action": { "enum": ["allow", "report", "deny"] },
+        "evidenceSource": { "type": "string" },
+        "message": { "type": "string" },
+        "objectRef": { "$ref": "#/definitions/pdfObjectRef" }
+      }
+    },
+    "pdfForm": {
+      "type": "object",
+      "required": ["id", "pageNumber", "confidence", "source", "fields"],
+      "properties": {
+        "id": { "type": "string" },
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "title": { "type": "string" },
+        "heuristic": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source": { "$ref": "#/definitions/blockSource" },
+        "fields": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfFormField" }
+        }
+      }
+    },
+    "pdfFormField": {
+      "type": "object",
+      "required": ["id", "pageNumber", "name", "valueState", "confidence", "source"],
+      "properties": {
+        "id": { "type": "string" },
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "valueState": { "enum": ["value-present", "not-observed"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source": { "$ref": "#/definitions/blockSource" }
+      }
+    },
+    "pdfTableCell": {
+      "type": "object",
+      "required": ["rowIndex", "columnIndex", "text", "source"],
+      "properties": {
+        "rowIndex": { "type": "integer", "minimum": 0 },
+        "columnIndex": { "type": "integer", "minimum": 0 },
+        "text": { "type": "string" },
+        "source": { "$ref": "#/definitions/blockSource" }
+      }
+    },
+    "pdfCitation": {
+      "type": "object",
+      "required": ["id", "pageNumber", "blockId", "runIds", "text"],
+      "properties": {
+        "id": { "type": "string" },
+        "pageNumber": { "type": "integer", "minimum": 1 },
+        "blockId": { "type": "string" },
+        "runIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "text": { "type": "string" },
+        "pageRef": { "$ref": "#/definitions/pdfObjectRef" },
+        "sourceSpan": { "$ref": "#/definitions/pdfSourceSpan" }
+      }
+    },
+    "pdfSourceSpan": {
+      "type": "object",
+      "required": ["text", "blockRange", "runSpans"],
+      "properties": {
+        "text": { "type": "string" },
+        "blockRange": { "$ref": "#/definitions/textRange" },
+        "runSpans": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pdfRunSpan" }
+        },
+        "bbox": { "$ref": "#/definitions/pdfBoundingBox" },
+        "pageRef": { "$ref": "#/definitions/pdfObjectRef" }
+      }
+    },
+    "pdfRunSpan": {
+      "type": "object",
+      "required": ["runId", "range", "text"],
+      "properties": {
+        "runId": { "type": "string" },
+        "range": { "$ref": "#/definitions/textRange" },
+        "text": { "type": "string" },
+        "bbox": { "$ref": "#/definitions/pdfBoundingBox" }
+      }
+    },
+    "textRange": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "pdfBoundingBox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    },
+    "pdfObjectRef": {
+      "type": "object",
+      "required": ["objectNumber", "generationNumber"],
+      "properties": {
+        "objectNumber": { "type": "integer", "minimum": 0 },
+        "generationNumber": { "type": "integer", "minimum": 0 }
       }
     },
     "link": {

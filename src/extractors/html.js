@@ -67,7 +67,7 @@ export function extractHtmlDocument({
 
   const title = doc?.title || (sections[0]?.heading ?? "Untitled");
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url: url || locationRef?.href || "",
     title,
     family: family || "generic",

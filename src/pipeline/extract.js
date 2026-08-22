@@ -176,7 +176,7 @@ async function getHtmlEngine() {
 
 function unsupportedSnapshot({ snapshot, sourceUrl, familyId, authority, plugin, extractorId }) {
   return {
-    schemaVersion: "0.2",
+    schemaVersion: "0.1",
     url: sourceUrl,
     title: sourceUrl,
     family: familyId,
