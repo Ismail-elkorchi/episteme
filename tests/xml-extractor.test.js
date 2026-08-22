@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import test from "node:test";
 import { extractXmlDocument } from "../src/extractors/xml.js";
 import { assertSchema } from "./helpers/schema-validator.js";
 
@@ -35,7 +36,7 @@ function findDefinition(items, predicate) {
   return items.find((item) => predicate(item.term || "", item.definition || ""));
 }
 
-async function testPremisFacets() {
+test("extracts PREMIS enumeration facets", async () => {
   const xmlText = await loadFixtureText(
     "https://www.loc.gov/standards/premis/v3/premis-v3-0.xsd",
   );
@@ -59,9 +60,9 @@ async function testPremisFacets() {
     facetItem,
     "Expected PREMIS XSD to yield at least one simpleType with enumeration facets",
   );
-}
+});
 
-async function testXmlNamespaceFacets() {
+test("extracts XML namespace enumeration facets", async () => {
   const xmlText = await loadFixtureText("https://www.w3.org/2001/xml.xsd");
   const doc = extractXmlDocument({
     text: xmlText,
@@ -83,9 +84,9 @@ async function testXmlNamespaceFacets() {
     facetItem,
     "Expected xml.xsd to yield at least one simpleType with enumeration facets",
   );
-}
+});
 
-async function testSyntheticAssertions() {
+test("extracts synthetic XSD 1.1 assertions", async () => {
   const synthetic = `<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
@@ -124,16 +125,4 @@ async function testSyntheticAssertions() {
     assertionItem,
     "Expected synthetic XSD to yield an assertion summary on complexType RangeType",
   );
-}
-
-async function run() {
-  await testPremisFacets();
-  await testXmlNamespaceFacets();
-  await testSyntheticAssertions();
-  console.log("xml-extractor tests passed");
-}
-
-run().catch((error) => {
-  console.error("xml-extractor tests failed", error);
-  process.exit(1);
 });

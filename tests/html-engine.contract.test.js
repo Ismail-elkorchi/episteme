@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
+import test from "node:test";
 import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { assertHtmlEngineContract } from "../src/extractors/html-engine/contract.js";
 
-async function testContractValidation() {
+test("validates the HTML engine contract", async () => {
   const engine = await resolveHtmlEngine();
   assert.equal(assertHtmlEngineContract(engine), engine);
 
@@ -13,9 +14,9 @@ async function testContractValidation() {
       }),
     /must implement method/,
   );
-}
+});
 
-async function testParserStackEngineSurface() {
+test("exposes the parser stack engine surface", async () => {
   const engine = await resolveHtmlEngine();
   const dom = engine.parse({
     html: `<!doctype html>
@@ -50,15 +51,4 @@ async function testParserStackEngineSurface() {
 
   const paragraph = engine.queryOne(section, "p[data-k='v']");
   assert.equal(engine.text(paragraph).replace(/\s+/g, " ").trim(), "Hello world");
-}
-
-async function run() {
-  await testContractValidation();
-  await testParserStackEngineSurface();
-  console.log("html-engine contract tests passed");
-}
-
-run().catch((error) => {
-  console.error("html-engine contract tests failed", error);
-  process.exit(1);
 });

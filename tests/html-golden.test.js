@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
+import test from "node:test";
 import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { extractHtmlDocument } from "../src/extractors/html.js";
+import { assertSchema } from "./helpers/schema-validator.js";
 
 // Fixture conventions:
 // - one directory per case id under tests/fixtures/html-golden
@@ -46,30 +48,23 @@ function extractFixture({ fixture, engine }) {
     dom,
     htmlEngine: engine,
   });
-  return normalizeExtractedDocument(documentData);
+  return documentData;
 }
 
-async function testGoldenFixtures() {
+test("matches deterministic HTML golden fixtures", async () => {
   const fixtureIds = await listFixtureIds();
   assert.ok(fixtureIds.length > 0, "expected at least one golden fixture");
   const engine = await resolveHtmlEngine();
 
   for (const fixtureId of fixtureIds) {
     const fixture = await loadFixture(fixtureId);
-    const runA = extractFixture({ fixture, engine });
-    const runB = extractFixture({ fixture, engine });
+    const extractedA = extractFixture({ fixture, engine });
+    const extractedB = extractFixture({ fixture, engine });
+    await assertSchema(extractedA, `html-golden-${fixtureId}`);
+    const runA = normalizeExtractedDocument(extractedA);
+    const runB = normalizeExtractedDocument(extractedB);
 
     assert.deepEqual(runB, runA, `fixture "${fixtureId}" is non-deterministic across repeated runs`);
     assert.deepEqual(runA, fixture.expected, `fixture "${fixtureId}" output mismatch`);
   }
-}
-
-async function run() {
-  await testGoldenFixtures();
-  console.log("html golden fixture tests passed");
-}
-
-run().catch((error) => {
-  console.error("html golden fixture tests failed", error);
-  process.exit(1);
 });
