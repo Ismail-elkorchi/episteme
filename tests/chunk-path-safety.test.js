@@ -4,6 +4,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { chunkAll } from "../src/pipeline/chunk.js";
+import { buildIndex } from "../src/pipeline/index.js";
+import { fingerprintJson, withFingerprint, writeJson } from "../src/utils.js";
+import { extractionFixture } from "./helpers/extraction-fixture.js";
 
 test("extracted IDs cannot control output paths", async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-chunk-path-"));
@@ -13,11 +16,23 @@ test("extracted IDs cannot control output paths", async () => {
 
   try {
     await fs.mkdir(inputDir);
-    await fs.writeFile(
-      path.join(inputDir, "document.json"),
-      JSON.stringify({
-        url: "https://example.test/document",
+    const url = "https://example.test/document";
+    const context = extractionFixture({
+      url,
+      content: "The payload must remain in the family directory.",
+      contentType: "text/plain; charset=utf-8",
+      extractor: "text",
+      family: hostileFamily,
+    });
+    const document = {
+        schemaVersion: "1",
+        contentTrust: "untrusted-source",
+        url,
+        title: "Hostile identifiers",
         family: hostileFamily,
+        authority: "informative",
+        documentType: null,
+        ...context,
         sections: [
           {
             id: "../../../hostile-section",
@@ -31,9 +46,24 @@ test("extracted IDs cannot control output paths", async () => {
             ],
           },
         ],
-      }),
-      "utf8",
-    );
+      };
+    const docId = `document-${fingerprintJson(document)}`;
+    const documentPath = path.join("documents", `${docId}.json`);
+    const written = await writeJson(path.join(inputDir, documentPath), document);
+    await writeJson(path.join(inputDir, "index.json"), withFingerprint({
+      schemaVersion: "1",
+      artifactType: "document-index",
+      documents: [{
+        docId,
+        url,
+        snapshotId: document.snapshotId,
+        extractor: document.provenance.extractor,
+        family: hostileFamily,
+        path: documentPath,
+        bytes: written.bytes,
+        sha256: written.sha256,
+      }],
+    }));
 
     await chunkAll({ inputDir, outDir });
 
@@ -49,6 +79,16 @@ test("extracted IDs cannot control output paths", async () => {
     const resolvedOutDir = `${path.resolve(outDir)}${path.sep}`;
     assert.equal(resolvedOutput.startsWith(resolvedOutDir), true);
     assert.equal(JSON.parse(await fs.readFile(resolvedOutput, "utf8")).text.includes("payload"), true);
+
+    const hostileIndex = withFingerprint({
+      ...index,
+      chunks: [{ ...index.chunks[0], path: "../outside.json" }],
+    });
+    await fs.writeFile(path.join(outDir, "index.json"), JSON.stringify(hostileIndex), "utf8");
+    await assert.rejects(
+      buildIndex({ chunksDir: outDir, outFile: path.join(outDir, "search-index.json") }),
+      (error) => error.code === "INVALID_INPUT" && /escapes the chunk directory/u.test(error.message),
+    );
 
     await assert.rejects(fs.access(path.join(root, "escaped-family")));
     await assert.rejects(fs.access(path.join(outDir, "escaped.json")));

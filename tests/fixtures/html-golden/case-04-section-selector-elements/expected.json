@@ -1,62 +1,81 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-04-section-selector-elements",
-  "title": "Case 04",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-04-section-selector-elements",
-  "source": {
-    "fixtureId": "case-04-section-selector-elements"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "19a0251d92df0117abb7afa1cc86b6cad1704e14702298a0a17ebac99e1d8a28",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "ec5d112e46215152fde955eed0aaef4f8a6f077f999cf4cd8677169a0ea42168"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "section-a",
-      "heading": "Clause A",
-      "level": 2,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-04-section-selector-elements",
             "fragment": null,
-            "path": "section:nth-of-type(1) > p:nth-of-type(1)"
+            "path": "section:nth-of-type(1) > p:nth-of-type(1)",
+            "url": "https://example.test/case-04-section-selector-elements"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "A paragraph."
+          "text": "A paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Clause A",
+      "id": "section-a",
+      "level": 2,
       "source": {
-        "url": "https://example.test/case-04-section-selector-elements#section-a",
         "fragment": "section-a",
-        "path": "section:nth-of-type(1) > h2:nth-of-type(1)"
+        "path": "section:nth-of-type(1) > h2:nth-of-type(1)",
+        "url": "https://example.test/case-04-section-selector-elements#section-a"
       }
     },
     {
-      "id": "heading-b",
-      "heading": "Clause B",
-      "level": 3,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-04-section-selector-elements",
             "fragment": null,
-            "path": "section:nth-of-type(2) > p:nth-of-type(1)"
+            "path": "section:nth-of-type(2) > p:nth-of-type(1)",
+            "url": "https://example.test/case-04-section-selector-elements"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "B paragraph."
+          "text": "B paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Clause B",
+      "id": "heading-b",
+      "level": 3,
       "source": {
-        "url": "https://example.test/case-04-section-selector-elements#heading-b",
         "fragment": "heading-b",
-        "path": "section:nth-of-type(2) > h3:nth-of-type(1)"
+        "path": "section:nth-of-type(2) > h3:nth-of-type(1)",
+        "url": "https://example.test/case-04-section-selector-elements#heading-b"
       }
     }
-  ]
+  ],
+  "snapshotId": "35ba5b8f35c82820d5cd0a58b08e39364d9ce1aa4625ecfedae56b88028831aa",
+  "source": {
+    "bytes": 306,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-04-section-selector-elements",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "ec5d112e46215152fde955eed0aaef4f8a6f077f999cf4cd8677169a0ea42168",
+    "snapshotId": "35ba5b8f35c82820d5cd0a58b08e39364d9ce1aa4625ecfedae56b88028831aa",
+    "sourceUrl": "https://example.test/case-04-section-selector-elements"
+  },
+  "title": "Case 04",
+  "url": "https://example.test/case-04-section-selector-elements"
 }

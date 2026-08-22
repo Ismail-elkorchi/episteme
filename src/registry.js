@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { inputError } from "./errors.js";
 
 const FAMILY_DIR = new URL("./families/", import.meta.url);
 
@@ -51,6 +52,7 @@ export function resolveFamily(plugins, urlString, explicitFamily) {
     if (match) {
       return match;
     }
+    throw inputError(`Unknown extraction family: ${explicitFamily}`, { family: explicitFamily });
   }
   const url = new URL(urlString);
   for (const plugin of plugins) {

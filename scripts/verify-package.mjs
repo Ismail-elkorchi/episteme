@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { EPISTEME_VERSION } from "../src/constants.js";
 
 const allowedPackPrefixes = [
   "package.json",
@@ -18,6 +19,9 @@ function checkNpmPack() {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
   if (packageJson.name !== "episteme") {
     fail(`unexpected npm package name: ${packageJson.name}`);
+  }
+  if (packageJson.version !== EPISTEME_VERSION) {
+    fail(`package version and runtime version disagree: ${packageJson.version} != ${EPISTEME_VERSION}`);
   }
   if (packageJson.bin?.episteme !== "src/cli.js") {
     fail("npm package must expose the episteme CLI");
@@ -38,7 +42,14 @@ function checkNpmPack() {
     fail(`npm package contains files outside public allowlist: ${violations.join(", ")}`);
   }
 
-  for (const requiredFile of ["README.md", "LICENSE", "schema/document.schema.json", "src/cli.js"]) {
+  for (const requiredFile of [
+    "README.md",
+    "LICENSE",
+    "schema/artifact.schema.json",
+    "schema/cli-envelope.schema.json",
+    "schema/document.schema.json",
+    "src/cli.js",
+  ]) {
     if (!files.includes(requiredFile)) {
       fail(`npm package is missing required file: ${requiredFile}`);
     }

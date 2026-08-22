@@ -1,5 +1,6 @@
 import { parseXml } from "@ismail-elkorchi/xml-parser";
 import { normalizeText } from "../utils.js";
+import { documentBase } from "../document.js";
 
 const XSD_SCHEMA_ATTRS = [
   "targetNamespace",
@@ -34,6 +35,7 @@ export function extractXmlDocument({
   source,
   documentType,
   title,
+  provenance,
 }) {
   let parsed;
   try {
@@ -48,6 +50,7 @@ export function extractXmlDocument({
       source,
       documentType,
       title,
+      provenance,
       warning: `XML parse failed: ${error?.message || String(error)}`,
     });
   }
@@ -61,15 +64,16 @@ export function extractXmlDocument({
     : buildGenericXmlSections(rootName || "document", rootNode);
 
   return {
-    schemaVersion: "0.1",
-    url,
-    title: title || url,
-    family: family || "generic",
-    authority: authority || "informative",
-    documentType: documentType || null,
-    snapshotId: snapshotId || null,
-    source: source || null,
-    extractedAt: new Date().toISOString(),
+    ...documentBase({
+      url,
+      title,
+      family,
+      authority,
+      documentType,
+      snapshotId,
+      source,
+      provenance,
+    }),
     sections,
     warnings: [],
   };
@@ -126,17 +130,28 @@ function toExtractorNode(node) {
   return out;
 }
 
-function buildErrorDoc({ url, family, authority, snapshotId, source, documentType, title, warning }) {
+function buildErrorDoc({
+  url,
+  family,
+  authority,
+  snapshotId,
+  source,
+  documentType,
+  title,
+  provenance,
+  warning,
+}) {
   return {
-    schemaVersion: "0.1",
-    url,
-    title: title || url,
-    family: family || "generic",
-    authority: authority || "informative",
-    documentType: documentType || null,
-    snapshotId: snapshotId || null,
-    source: source || null,
-    extractedAt: new Date().toISOString(),
+    ...documentBase({
+      url,
+      title,
+      family,
+      authority,
+      documentType,
+      snapshotId,
+      source,
+      provenance,
+    }),
     sections: [],
     warnings: [warning],
   };

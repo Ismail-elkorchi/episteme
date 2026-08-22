@@ -3,6 +3,7 @@ import test from "node:test";
 import { extractHtmlDocument } from "../src/extractors/html.js";
 import { resolveHtmlEngine } from "../src/extractors/html-engine/index.js";
 import { assertSchema } from "./helpers/schema-validator.js";
+import { extractionFixture } from "./helpers/extraction-fixture.js";
 
 async function buildDom(html, url) {
   const engine = await resolveHtmlEngine();
@@ -23,16 +24,25 @@ test("extracts a structured HTML document", async () => {
 </body>
 </html>`;
 
-  const dom = await buildDom(html, "https://example.test/doc");
+  const url = "https://example.test/doc";
+  const rules = {
+    rootSelector: "body",
+    useHeadings: true,
+    pruneSelectors: [],
+  };
+  const dom = await buildDom(html, url);
   const doc = extractHtmlDocument({
-    rules: {
-      rootSelector: "body",
-      useHeadings: true,
-      pruneSelectors: [],
-    },
-    url: "https://example.test/doc",
+    rules,
+    url,
     family: "generic",
     authority: "informative",
+    ...extractionFixture({
+      url,
+      content: html,
+      contentType: "text/html; charset=utf-8",
+      extractor: "html",
+      rules,
+    }),
     dom,
   });
 

@@ -1,81 +1,139 @@
 # Episteme
 
-Episteme is a deterministic CLI that snapshots sources and extracts structured, provenance-preserving documents.
-It is built for consumers who need reliable external knowledge for their own projects.
+Episteme is a deterministic, agent-first CLI for acquiring external sources and extracting
+structured, attributable evidence. It records HTTP or local-file snapshots, transforms them
+offline, creates bounded evidence chunks, and provides deterministic lexical retrieval.
+
+Episteme does not decide truth or synthesize knowledge. Its output remains evidence from an
+external source, with provenance and extraction limitations intact.
+
+## Agent-first contract
+
+Episteme is non-interactive, but its default output follows conventional CLI practice: concise,
+human-readable results on stdout and diagnostics on stderr. Add `--json` when a caller needs a
+stable, schema-versioned envelope. Help is always human-readable.
+
+Discover commands and options with conventional help:
+
+```sh
+episteme --help
+episteme query --help
+```
+
+Use `--progress=auto|always|never` to control progress on stderr. `auto` reports progress only
+when stderr is a terminal. With `--json`, forced progress is JSON Lines on stderr while the final
+envelope remains on stdout. `--debug` adds cause details to failures. The CLI is the supported
+automation interface; a stable JavaScript API is not part of the package contract.
 
 ## Goals
-- Deterministic extraction from snapshots into structured documents with provenance.
-- Provide a CLI pipeline for snapshot → extract → chunk → index.
-- Keep uncertainty and conflicts visible rather than smoothing them away.
-- Publish a machine-readable schema for extracted documents.
+
+- Reproducible extraction from a recorded snapshot and extraction configuration.
+- Precise attribution to URL, snapshot, source hash, fragment, PDF page, and source span when available.
+- Explicit warnings, diagnostics, confidence, and known extraction limits.
+- Bounded capture, chunking, query output, and pagination suitable for agent context windows.
+- Deterministic ranked retrieval without an LLM or embedding service.
+- Machine-readable, versioned document, artifact, and CLI-envelope schemas.
 
 ## Non-goals
-- Decide truth or resolve conflicts by authority.
-- Bypass access controls, CAPTCHAs, or licensing constraints.
-- Provide a general-purpose web crawler for arbitrary dynamic sites.
-- Guarantee a stable programmatic API in this release.
 
-## Determinism
-Snapshotting depends on external sources and can change over time.
-Determinism here means that extraction, chunking, and indexing are reproducible from a recorded snapshot and manifest.
+- Decide truth, rank sources by authority, or resolve contradictory claims.
+- Generate or maintain a wiki.
+- Provide an agent transport protocol or a universal knowledge interchange format.
+- Execute source scripts or crawl arbitrary dynamic sites.
+- Bypass access controls, CAPTCHA gates, or licensing restrictions.
 
-## Consumer Use
-- Provide your own manifest (list of URLs + extractors).
-- Run the CLI to snapshot, extract, chunk, and index.
-- Use the outputs in your project (software, research, writing, analysis, etc.).
+## Quick start
 
-## Manifest Format
-Episteme expects a JSON array of source entries:
+```sh
+npm install episteme
+npx episteme pipeline --manifest ./manifest.json
+npx episteme query --index ./chunks/search-index.json --term "popover algorithm" --limit 5
+```
+
+The parser and PDF-engine dependencies are included by the package.
+
+## Manifest
+
+The manifest is a strict JSON array. Unknown fields, invalid values, duplicate URLs, and
+non-HTTP(S) URLs are rejected rather than ignored.
+
 ```json
 [
   {
-    "url": "https://example.com/spec",
+    "url": "https://www.w3.org/TR/example/",
     "family": "w3c",
     "authority": "normative",
-    "extractor": "html",
-    "output": "custom-output-name",
-    "label": "Example Spec"
+    "extractor": "html"
   }
 ]
 ```
 
-Required:
-- `url`: source URL.
+Only `url` is required. Optional fields are:
 
-Optional:
-- `family`: extraction family (e.g., `w3c`, `whatwg`, `rfc`, or `generic`).
-- `authority`: `normative` | `informative`.
-- `extractor`: `html` | `pdf` | `text` | `xml` (defaults by family).
-- `output`: override output filename (without extension).
-- `label`: human-readable name.
+- `family`: a registered extraction family such as `w3c`, `whatwg`, `rfc`, or `generic`.
+- `authority`: `normative` or `informative`.
+- `extractor`: `html`, `pdf`, `text`, or `xml`.
 
-## Quick Start
-```sh
-npm install episteme
-npx episteme pipeline --manifest ./manifest.json
-```
+## Commands
 
-The published package already depends on the published parser stack packages.
-You do not need to install `@ismail-elkorchi/html-parser`, `@ismail-elkorchi/css-parser`, `@ismail-elkorchi/xml-parser`, or `@ismail-elkorchi/pdf-engine` manually for the default path.
+- `snapshot`: conditionally fetch and record bounded HTTP representations.
+- `manual-ingest`: record bounded local files under canonical HTTP(S) source URLs.
+- `extract`: transform recorded snapshots into structured JSON evidence without network access.
+- `chunk`: split extracted blocks into bounded, overlapping, attributable chunks.
+- `index`: build a deterministic BM25 lexical index over complete chunk text.
+- `query`: return ranked, bounded snippets and source citations with optional filters.
+- `diff`: compare complete extracted corpora, including added and removed documents.
+- `pipeline`: run `snapshot`, `extract`, `chunk`, and `index`.
 
-## CLI Commands
-- `snapshot`: fetch and store deterministic snapshots under `snapshots/`.
-- `manual-ingest`: ingest local files as manual snapshots.
-- `extract`: run per-family extraction rules against snapshots (no live web).
-- `chunk`: emit block-level chunks under `chunks/`.
-- `index`: build a search index from chunks.
-- `diff`: compare two extracted directories.
-- `query`: search an index for a term.
-- `pipeline`: snapshot → extract → chunk → index.
+Use `episteme <command> --help` for exact options, defaults, and limits. In particular,
+capture has configurable time, byte, retry, and source-count limits; chunk and query output
+have independent character and result limits.
 
-## Deno/Bun Usage
-```sh
-deno run --allow-read --allow-write --allow-net --node-modules-dir=manual src/cli.js pipeline --manifest ./manifest.json
-bun src/cli.js pipeline --manifest ./manifest.json
-```
+Manifests and manual-ingest maps accept `-` as a bounded stdin input. Query indexes also accept
+stdin, with a larger default bound suitable for corpus indexes. Override either bound explicitly
+with `--max-input-bytes`. `index --out -` and `diff --out -` require `--json`; the generated
+artifact is returned as `data.artifact` rather than mixed with human output.
 
-## Manual Ingest Map
-The `manual-ingest` command accepts a JSON array of local files:
+## Determinism
+
+Live network retrieval is not deterministic. A recorded snapshot contains the observation time,
+response validators, content hash, and representation metadata. Its snapshot ID is derived from
+the representation rather than the retrieval clock, so observing unchanged content is idempotent.
+
+Derived documents, chunks, indexes, and diffs contain no execution-time timestamps. JSON is
+written with stable property ordering, each derived artifact has a content fingerprint, and the
+document provenance records:
+
+- Episteme producer version.
+- Extractor identity.
+- Source SHA-256.
+- SHA-256 of the extraction configuration, including family rules and fragment selection.
+
+Given the same recorded snapshots, manifest, Episteme version, and options, derived artifact
+bytes must be identical.
+
+## Retrieval
+
+`query` uses a deterministic Unicode-aware BM25 index. Results can be filtered by family,
+authority, document type, and normativity. `limit`, `offset`, and `max-chars` bound context use.
+Every result includes a citation containing the source URL, fragment, snapshot ID, section/block
+identity, and available PDF page/span provenance.
+
+Search-index files contain source text and therefore inherit the same trust classification as
+the extracted documents.
+
+## Trust boundary
+
+All text originating in a captured source is marked `contentTrust: "untrusted-source"`.
+Consumers must treat it as data, never as Episteme or user instructions. Static HTML extraction
+does not execute scripts, but it does not make source language trustworthy.
+
+The manifest authorizes Episteme to make the listed network requests. Episteme is a local CLI,
+not a network isolation boundary; callers remain responsible for restricting the CLI's network
+access when manifests are produced by less-trusted agents.
+
+## Manual ingest
+
 ```json
 [
   {
@@ -86,24 +144,36 @@ The `manual-ingest` command accepts a JSON array of local files:
 ]
 ```
 
-Required:
-- `sourceUrl`: the canonical source URL.
-- `localPath`: absolute or relative path to the local file.
+Run:
 
-Optional:
-- `contentType`: MIME type (defaults to `application/octet-stream`).
+```sh
+episteme manual-ingest --map ./manual-ingest.json --snapshots ./snapshots
+```
 
-## Output
-- `specs/`: structured documents (JSON or Markdown)
-- `chunks/`: block-level chunks + index
-- `snapshots/`: raw snapshots + metadata
+Manual ingestion is content-addressed and idempotent. Changed content creates a new snapshot;
+unchanged content reuses the recorded one.
 
-PDF documents retain native reading order, tables, page citations, source spans,
-diagnostics, and known extraction limits in the structured JSON output.
+## Output and schemas
 
-## Schemas
-- Extracted document schema: `schema/document.schema.json`
+- `snapshots/`: content-addressed captured bytes, metadata, and an atomically committed source index.
+- `specs/`: content-addressed evidence documents and a hash-verifying document index.
+- `chunks/`: content-addressed evidence chunks, a hash-verifying chunk index, and a lexical search index.
+- `diffs/diff.json`: deterministic corpus diff.
+- `schema/document.schema.json`: extracted-document contract.
+- `schema/artifact.schema.json`: shared derived-artifact contract.
+- `schema/cli-envelope.schema.json`: process output contract.
+
+PDF evidence retains native reading order, tables, forms, page citations, source spans,
+diagnostics, and declared extraction limits.
+
+Corpus stages write data files before atomically committing `index.json`. Readers use only files
+named by that index and verify their hashes, so a failed or cancelled update leaves the previous
+commit usable. Writers take adjacent exclusive locks to prevent concurrent corpus mutation.
+Search indexes record their source chunk-index fingerprint; querying a stale index fails with a
+rebuild hint instead of silently returning obsolete evidence.
 
 ## Compatibility
-- Full pipeline (HTML + PDF): Node.js 24+ (LTS), latest stable Deno, or latest stable Bun.
-- The HTML and XML engines use the published parser dependencies included by npm.
+
+The full pipeline supports Node.js 24+, the pinned Deno release, and the pinned Bun release.
+Runtime-specific CLI subprocess tests execute on Node; the portable extraction and pipeline
+modules are tested on all three runtimes.

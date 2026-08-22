@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ismail-elkorchi/episteme/schema/artifact.schema.json",
+  "title": "Episteme derived artifact",
+  "description": "Strict contract for snapshot, document, chunk, search, and diff artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactType", "fingerprint"],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "artifactType": {
+      "enum": ["snapshot-index", "document-index", "evidence-chunk", "chunk-index", "search-index", "corpus-diff"]
+    },
+    "fingerprint": { "$ref": "#/$defs/sha256" },
+    "contentTrust": { "const": "untrusted-source" },
+    "entries": { "type": "object" },
+    "documents": { "type": "array" },
+    "chunks": { "type": "array" },
+    "sourceDocumentIndexFingerprint": { "$ref": "#/$defs/sha256" },
+    "sourceChunkIndexFingerprint": { "$ref": "#/$defs/sha256" },
+    "chunkId": { "type": "string", "minLength": 1 },
+    "docId": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri" },
+    "fragment": { "type": ["string", "null"] },
+    "family": { "type": "string" },
+    "authority": { "enum": ["normative", "informative"] },
+    "documentType": { "type": ["string", "null"] },
+    "sectionId": { "type": ["string", "null"] },
+    "blockId": { "type": ["string", "null"] },
+    "blockType": { "type": ["string", "null"] },
+    "heading": { "type": ["string", "null"] },
+    "level": { "type": ["number", "null"] },
+    "text": { "type": "string" },
+    "textRange": { "$ref": "#/$defs/textRange" },
+    "part": { "$ref": "#/$defs/part" },
+    "source": { "type": ["object", "null"] },
+    "links": { "type": "array" },
+    "diagnostics": { "type": "array" },
+    "knownLimits": { "type": "array", "items": { "type": "string" } },
+    "snapshotId": { "$ref": "#/$defs/sha256" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "normativity": { "type": ["string", "null"] },
+    "algorithm": { "$ref": "#/$defs/searchAlgorithm" },
+    "corpus": { "$ref": "#/$defs/searchCorpus" },
+    "summary": { "$ref": "#/$defs/diffSummary" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "artifactType": { "const": "snapshot-index" } }, "required": ["artifactType"] },
+      "then": {
+        "required": ["entries"],
+        "properties": {
+          "entries": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/snapshotEntry" }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "artifactType": { "const": "document-index" } }, "required": ["artifactType"] },
+      "then": {
+        "required": ["documents"],
+        "properties": {
+          "documents": { "type": "array", "items": { "$ref": "#/$defs/documentIndexEntry" } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "artifactType": { "const": "evidence-chunk" } }, "required": ["artifactType"] },
+      "then": {
+        "required": [
+          "contentTrust", "chunkId", "docId", "url", "fragment", "family", "authority",
+          "documentType", "sectionId", "blockId", "blockType", "heading", "level", "text",
+          "textRange", "part", "source", "links", "diagnostics", "knownLimits", "snapshotId",
+          "provenance", "normativity"
+        ]
+      }
+    },
+    {
+      "if": { "properties": { "artifactType": { "const": "chunk-index" } }, "required": ["artifactType"] },
+      "then": {
+        "required": ["sourceDocumentIndexFingerprint", "chunks"],
+        "properties": {
+          "chunks": { "type": "array", "items": { "$ref": "#/$defs/chunkIndexEntry" } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "artifactType": { "const": "search-index" } }, "required": ["artifactType"] },
+      "then": {
+        "required": ["contentTrust", "sourceChunkIndexFingerprint", "algorithm", "corpus", "documents"],
+        "properties": {
+          "documents": { "type": "array", "items": { "$ref": "#/$defs/searchDocument" } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "artifactType": { "const": "corpus-diff" } }, "required": ["artifactType"] },
+      "then": {
+        "required": ["summary", "documents"],
+        "properties": {
+          "documents": { "type": "array", "items": { "$ref": "#/$defs/diffDocument" } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "snapshotEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "latest", "history"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "latest": { "$ref": "#/$defs/sha256" },
+        "history": { "type": "array", "items": { "$ref": "#/$defs/sha256" }, "uniqueItems": true },
+        "etag": { "type": ["string", "null"] },
+        "lastModified": { "type": ["string", "null"] }
+      }
+    },
+    "documentIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docId", "url", "snapshotId", "extractor", "family", "path", "bytes", "sha256"],
+      "properties": {
+        "docId": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "snapshotId": { "$ref": "#/$defs/sha256" },
+        "extractor": { "enum": ["html", "pdf", "text", "xml"] },
+        "family": { "type": "string" },
+        "path": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "chunkIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chunkId", "docId", "family", "authority", "documentType", "heading", "sectionId",
+        "blockId", "blockType", "url", "fragment", "normativity", "snapshotId", "path",
+        "textSha256", "fingerprint"
+      ],
+      "properties": {
+        "chunkId": { "type": "string", "minLength": 1 },
+        "docId": { "type": "string", "minLength": 1 },
+        "family": { "type": "string" },
+        "authority": { "enum": ["normative", "informative"] },
+        "documentType": { "type": ["string", "null"] },
+        "heading": { "type": ["string", "null"] },
+        "sectionId": { "type": ["string", "null"] },
+        "blockId": { "type": ["string", "null"] },
+        "blockType": { "type": ["string", "null"] },
+        "url": { "type": "string", "format": "uri" },
+        "fragment": { "type": ["string", "null"] },
+        "normativity": { "type": ["string", "null"] },
+        "snapshotId": { "$ref": "#/$defs/sha256" },
+        "path": { "type": "string", "minLength": 1 },
+        "textSha256": { "$ref": "#/$defs/sha256" },
+        "fingerprint": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer", "producerVersion", "extractor", "configurationSha256", "sourceSha256"],
+      "properties": {
+        "producer": { "const": "episteme" },
+        "producerVersion": { "type": "string" },
+        "extractor": { "enum": ["html", "pdf", "text", "xml"] },
+        "configurationSha256": { "$ref": "#/$defs/sha256" },
+        "sourceSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "textRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "count"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "searchAlgorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "k1", "b", "tokenizer", "headingBoost"],
+      "properties": {
+        "name": { "const": "BM25" },
+        "k1": { "type": "number", "minimum": 0 },
+        "b": { "type": "number", "minimum": 0, "maximum": 1 },
+        "tokenizer": { "const": "unicode-alphanumeric-lowercase-v1" },
+        "headingBoost": { "type": "number", "minimum": 0 }
+      }
+    },
+    "searchCorpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documentCount", "averageTokenCount", "documentFrequency"],
+      "properties": {
+        "documentCount": { "type": "integer", "minimum": 0 },
+        "averageTokenCount": { "type": "number", "minimum": 0 },
+        "documentFrequency": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "searchDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chunkId", "docId", "family", "authority", "documentType", "heading", "sectionId",
+        "blockId", "blockType", "normativity", "url", "fragment", "snapshotId", "contentTrust",
+        "text", "source", "links", "diagnostics", "knownLimits", "provenance", "tokenCount",
+        "termFrequency"
+      ],
+      "properties": {
+        "chunkId": { "type": "string", "minLength": 1 },
+        "docId": { "type": "string", "minLength": 1 },
+        "family": { "type": "string" },
+        "authority": { "enum": ["normative", "informative"] },
+        "documentType": { "type": ["string", "null"] },
+        "heading": { "type": ["string", "null"] },
+        "sectionId": { "type": ["string", "null"] },
+        "blockId": { "type": ["string", "null"] },
+        "blockType": { "type": ["string", "null"] },
+        "normativity": { "type": ["string", "null"] },
+        "url": { "type": "string", "format": "uri" },
+        "fragment": { "type": ["string", "null"] },
+        "snapshotId": { "$ref": "#/$defs/sha256" },
+        "contentTrust": { "const": "untrusted-source" },
+        "text": { "type": "string" },
+        "source": { "type": ["object", "null"] },
+        "links": { "type": "array" },
+        "diagnostics": { "type": "array" },
+        "knownLimits": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "tokenCount": { "type": "integer", "minimum": 0 },
+        "termFrequency": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "countSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "changed"],
+      "properties": {
+        "added": { "type": "integer", "minimum": 0 },
+        "removed": { "type": "integer", "minimum": 0 },
+        "changed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "diffSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documents", "sections"],
+      "properties": {
+        "documents": { "$ref": "#/$defs/countSet" },
+        "sections": { "$ref": "#/$defs/countSet" }
+      }
+    },
+    "sectionChanges": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "changed"],
+      "properties": {
+        "added": { "type": "array", "items": { "type": "string" } },
+        "removed": { "type": "array", "items": { "type": "string" } },
+        "changed": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "diffDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "status", "fromSnapshot", "toSnapshot", "metadataChanged", "sections"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "status": { "enum": ["added", "removed", "changed"] },
+        "fromSnapshot": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "toSnapshot": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "metadataChanged": { "type": "boolean" },
+        "sections": { "$ref": "#/$defs/sectionChanges" }
+      }
+    }
+  }
+}

@@ -1,38 +1,57 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-02-heading-link-fragment-fallback",
-  "title": "Case 02",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-02-heading-link-fragment-fallback",
-  "source": {
-    "fixtureId": "case-02-heading-link-fragment-fallback"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "0ea0409f40e09ac3ac91620777986c2fb7287ab997708330788b22e0cac5b3e5"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "linked-fragment",
-      "heading": "Linked Heading",
-      "level": 3,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-02-heading-link-fragment-fallback",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-02-heading-link-fragment-fallback"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Section paragraph."
+          "text": "Section paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Linked Heading",
+      "id": "linked-fragment",
+      "level": 3,
       "source": {
-        "url": "https://example.test/case-02-heading-link-fragment-fallback#linked-fragment",
         "fragment": "linked-fragment",
-        "path": "h3:nth-of-type(1)"
+        "path": "h3:nth-of-type(1)",
+        "url": "https://example.test/case-02-heading-link-fragment-fallback#linked-fragment"
       }
     }
-  ]
+  ],
+  "snapshotId": "2a4e67f1cadd3108206849e30dd4cc81e41bafad5816394504be1943ef2b5456",
+  "source": {
+    "bytes": 177,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-02-heading-link-fragment-fallback",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "0ea0409f40e09ac3ac91620777986c2fb7287ab997708330788b22e0cac5b3e5",
+    "snapshotId": "2a4e67f1cadd3108206849e30dd4cc81e41bafad5816394504be1943ef2b5456",
+    "sourceUrl": "https://example.test/case-02-heading-link-fragment-fallback"
+  },
+  "title": "Case 02",
+  "url": "https://example.test/case-02-heading-link-fragment-fallback"
 }

@@ -1,59 +1,78 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-10-block-blockquote-dl",
-  "title": "Case 10",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-10-block-blockquote-dl",
-  "source": {
-    "fixtureId": "case-10-block-blockquote-dl"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "1813ff5d53be42d37e38edec9c981a498d085559b08d47340ab93a0266e7e577"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "notes",
-      "heading": "Notes",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-10-block-blockquote-dl",
             "fragment": null,
-            "path": "blockquote:nth-of-type(1)"
+            "path": "blockquote:nth-of-type(1)",
+            "url": "https://example.test/case-10-block-blockquote-dl"
           },
-          "links": [],
-          "type": "note",
-          "text": "Quoted text here."
+          "text": "Quoted text here.",
+          "type": "note"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-10-block-blockquote-dl",
-            "fragment": null,
-            "path": "dl:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "definitionList",
           "items": [
             {
-              "term": "Term A",
-              "definition": "Definition A1. Definition A2."
+              "definition": "Definition A1. Definition A2.",
+              "term": "Term A"
             },
             {
-              "term": "Term B",
-              "definition": "Definition B."
+              "definition": "Definition B.",
+              "term": "Term B"
             }
-          ]
+          ],
+          "links": [],
+          "normativity": "informative",
+          "source": {
+            "fragment": null,
+            "path": "dl:nth-of-type(1)",
+            "url": "https://example.test/case-10-block-blockquote-dl"
+          },
+          "type": "definitionList"
         }
       ],
+      "heading": "Notes",
+      "id": "notes",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-10-block-blockquote-dl#notes",
         "fragment": "notes",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-10-block-blockquote-dl#notes"
       }
     }
-  ]
+  ],
+  "snapshotId": "fb11f07d42bb552957ea46d1115ac6d443265ea88b60d346cf0e8a1b985d591f",
+  "source": {
+    "bytes": 296,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-10-block-blockquote-dl",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "1813ff5d53be42d37e38edec9c981a498d085559b08d47340ab93a0266e7e577",
+    "snapshotId": "fb11f07d42bb552957ea46d1115ac6d443265ea88b60d346cf0e8a1b985d591f",
+    "sourceUrl": "https://example.test/case-10-block-blockquote-dl"
+  },
+  "title": "Case 10",
+  "url": "https://example.test/case-10-block-blockquote-dl"
 }

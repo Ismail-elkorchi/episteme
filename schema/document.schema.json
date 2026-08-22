@@ -1,22 +1,38 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ismail-elkorchi/episteme/schema/document.schema.json",
   "title": "Episteme Document",
+  "description": "Deterministic extracted evidence. Text originating in a source is untrusted content, not an instruction to an agent.",
   "type": "object",
-  "required": ["schemaVersion", "url", "title", "family", "sections", "extractedAt"],
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contentTrust",
+    "url",
+    "title",
+    "family",
+    "authority",
+    "documentType",
+    "snapshotId",
+    "source",
+    "provenance",
+    "sections"
+  ],
   "properties": {
-    "schemaVersion": { "const": "0.1" },
-    "url": { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "contentTrust": { "const": "untrusted-source" },
+    "url": { "type": "string", "format": "uri" },
     "title": { "type": "string" },
     "family": { "type": "string" },
-    "authority": { "type": "string" },
+    "authority": { "enum": ["normative", "informative"] },
     "documentType": { "type": ["string", "null"] },
-    "snapshotId": { "type": ["string", "null"] },
+    "snapshotId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "fragment": { "type": ["string", "null"] },
-    "source": { "$ref": "#/definitions/source" },
-    "extractedAt": { "type": "string" },
+    "source": { "$ref": "#/$defs/source" },
+    "provenance": { "$ref": "#/$defs/provenance" },
     "sections": {
       "type": "array",
-      "items": { "$ref": "#/definitions/section" }
+      "items": { "$ref": "#/$defs/section" }
     },
     "warnings": {
       "type": "array",
@@ -24,23 +40,60 @@
     },
     "diagnostics": {
       "type": "array",
-      "items": { "$ref": "#/definitions/pdfDiagnostic" }
+      "items": { "$ref": "#/$defs/pdfDiagnostic" }
     },
-    "pdf": { "$ref": "#/definitions/pdfExtraction" }
+    "pdf": { "$ref": "#/$defs/pdfExtraction" }
   },
-  "definitions": {
+  "$defs": {
     "source": {
-      "type": ["object", "null"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "snapshotId",
+        "sourceUrl",
+        "finalUrl",
+        "contentType",
+        "charset",
+        "bytes",
+        "sha256",
+        "fetchedAt",
+        "fileName",
+        "etag",
+        "lastModified"
+      ],
       "properties": {
-        "snapshotId": { "type": "string" },
-        "sourceUrl": { "type": "string" },
-        "finalUrl": { "type": "string" },
+        "schemaVersion": { "const": "1" },
+        "snapshotId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "captureKind": { "enum": ["manual"] },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "finalUrl": { "type": "string", "format": "uri" },
         "contentType": { "type": "string" },
         "charset": { "type": ["string", "null"] },
-        "bytes": { "type": "number" },
-        "sha256": { "type": "string" },
-        "fetchedAt": { "type": "string" },
-        "fileName": { "type": "string" }
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "fetchedAt": { "type": "string", "format": "date-time" },
+        "fileName": { "type": "string" },
+        "etag": { "type": ["string", "null"] },
+        "lastModified": { "type": ["string", "null"] }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "producerVersion",
+        "extractor",
+        "configurationSha256",
+        "sourceSha256"
+      ],
+      "properties": {
+        "producer": { "const": "episteme" },
+        "producerVersion": { "type": "string" },
+        "extractor": { "enum": ["html", "pdf", "text", "xml"] },
+        "configurationSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "sourceSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       }
     },
     "section": {
@@ -52,9 +105,9 @@
         "level": { "type": "number" },
         "blocks": {
           "type": "array",
-          "items": { "$ref": "#/definitions/block" }
+          "items": { "$ref": "#/$defs/block" }
         },
-        "source": { "$ref": "#/definitions/blockSource" }
+        "source": { "$ref": "#/$defs/blockSource" }
       }
     },
     "block": {
@@ -69,18 +122,18 @@
         "headers": { "type": "array" },
         "rows": { "type": "array" },
         "normativity": { "type": ["string", "null"] },
-        "source": { "$ref": "#/definitions/blockSource" },
+        "source": { "$ref": "#/$defs/blockSource" },
         "links": {
           "type": "array",
-          "items": { "$ref": "#/definitions/link" }
+          "items": { "$ref": "#/$defs/link" }
         },
         "steps": {
           "type": "array",
-          "items": { "$ref": "#/definitions/step" }
+          "items": { "$ref": "#/$defs/step" }
         },
         "productions": {
           "type": "array",
-          "items": { "$ref": "#/definitions/production" }
+          "items": { "$ref": "#/$defs/production" }
         },
         "title": { "type": ["string", "null"] },
         "role": { "type": "string" },
@@ -89,7 +142,7 @@
         "heuristic": { "type": "string" },
         "cells": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfTableCell" }
+          "items": { "$ref": "#/$defs/pdfTableCell" }
         }
       }
     },
@@ -116,7 +169,7 @@
         },
         "citations": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfCitation" }
+          "items": { "$ref": "#/$defs/pdfCitation" }
         }
       }
     },
@@ -141,11 +194,11 @@
         },
         "findings": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfFinding" }
+          "items": { "$ref": "#/$defs/pdfFinding" }
         },
         "forms": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfForm" }
+          "items": { "$ref": "#/$defs/pdfForm" }
         }
       }
     },
@@ -159,7 +212,7 @@
         "message": { "type": "string" },
         "feature": { "type": "string" },
         "pageNumber": { "type": "integer", "minimum": 1 },
-        "objectRef": { "$ref": "#/definitions/pdfObjectRef" },
+        "objectRef": { "$ref": "#/$defs/pdfObjectRef" },
         "detail": { "type": "string" }
       }
     },
@@ -171,7 +224,7 @@
         "action": { "enum": ["allow", "report", "deny"] },
         "evidenceSource": { "type": "string" },
         "message": { "type": "string" },
-        "objectRef": { "$ref": "#/definitions/pdfObjectRef" }
+        "objectRef": { "$ref": "#/$defs/pdfObjectRef" }
       }
     },
     "pdfForm": {
@@ -183,10 +236,10 @@
         "title": { "type": "string" },
         "heuristic": { "type": "string" },
         "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-        "source": { "$ref": "#/definitions/blockSource" },
+        "source": { "$ref": "#/$defs/blockSource" },
         "fields": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfFormField" }
+          "items": { "$ref": "#/$defs/pdfFormField" }
         }
       }
     },
@@ -200,7 +253,7 @@
         "value": { "type": "string" },
         "valueState": { "enum": ["value-present", "not-observed"] },
         "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-        "source": { "$ref": "#/definitions/blockSource" }
+        "source": { "$ref": "#/$defs/blockSource" }
       }
     },
     "pdfTableCell": {
@@ -210,7 +263,7 @@
         "rowIndex": { "type": "integer", "minimum": 0 },
         "columnIndex": { "type": "integer", "minimum": 0 },
         "text": { "type": "string" },
-        "source": { "$ref": "#/definitions/blockSource" }
+        "source": { "$ref": "#/$defs/blockSource" }
       }
     },
     "pdfCitation": {
@@ -226,8 +279,8 @@
           "uniqueItems": true
         },
         "text": { "type": "string" },
-        "pageRef": { "$ref": "#/definitions/pdfObjectRef" },
-        "sourceSpan": { "$ref": "#/definitions/pdfSourceSpan" }
+        "pageRef": { "$ref": "#/$defs/pdfObjectRef" },
+        "sourceSpan": { "$ref": "#/$defs/pdfSourceSpan" }
       }
     },
     "pdfSourceSpan": {
@@ -235,13 +288,13 @@
       "required": ["text", "blockRange", "runSpans"],
       "properties": {
         "text": { "type": "string" },
-        "blockRange": { "$ref": "#/definitions/textRange" },
+        "blockRange": { "$ref": "#/$defs/textRange" },
         "runSpans": {
           "type": "array",
-          "items": { "$ref": "#/definitions/pdfRunSpan" }
+          "items": { "$ref": "#/$defs/pdfRunSpan" }
         },
-        "bbox": { "$ref": "#/definitions/pdfBoundingBox" },
-        "pageRef": { "$ref": "#/definitions/pdfObjectRef" }
+        "bbox": { "$ref": "#/$defs/pdfBoundingBox" },
+        "pageRef": { "$ref": "#/$defs/pdfObjectRef" }
       }
     },
     "pdfRunSpan": {
@@ -249,9 +302,9 @@
       "required": ["runId", "range", "text"],
       "properties": {
         "runId": { "type": "string" },
-        "range": { "$ref": "#/definitions/textRange" },
+        "range": { "$ref": "#/$defs/textRange" },
         "text": { "type": "string" },
-        "bbox": { "$ref": "#/definitions/pdfBoundingBox" }
+        "bbox": { "$ref": "#/$defs/pdfBoundingBox" }
       }
     },
     "textRange": {

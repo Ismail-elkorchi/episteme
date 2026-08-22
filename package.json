@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": false,
   "type": "module",
-  "description": "Deterministic, agent-first extraction of structured knowledge.",
+  "description": "Deterministic, agent-first extraction of attributable evidence.",
   "engines": {
     "node": ">=24"
   },
@@ -34,9 +34,9 @@
     "chunk": "node src/cli.js chunk",
     "index": "node src/cli.js index",
     "diff": "node src/cli.js diff",
+    "query": "node src/cli.js query",
     "pipeline": "node src/cli.js pipeline",
-    "extract:example": "node src/cli.js extract --manifest examples/manifest.json --out out --format json",
-    "extract:md": "node src/cli.js extract --manifest examples/manifest.json --out out --format md",
+    "extract:example": "node src/cli.js extract --manifest examples/manifest.json --out out",
     "manual-ingest": "node src/cli.js manual-ingest",
     "test:xml": "node --test tests/xml-extractor.test.js",
     "test:html-engine": "node --test tests/html-engine.contract.test.js",

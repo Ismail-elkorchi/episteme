@@ -1,38 +1,57 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-05-prune-selector-removes-noise",
-  "title": "Case 05",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-05-prune-selector-removes-noise",
-  "source": {
-    "fixtureId": "case-05-prune-selector-removes-noise"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "dbfdcee490726cabb8d0662b350f26cf5ed6e40eae88a8d33e6a27b458f4665f",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "e024c2a8466960d36a5792ba826b72df1124b31252d59544b0bf89493ce58d84"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "core",
-      "heading": "Core",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-05-prune-selector-removes-noise",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/case-05-prune-selector-removes-noise"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "Keep this paragraph."
+          "text": "Keep this paragraph.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Core",
+      "id": "core",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-05-prune-selector-removes-noise#core",
         "fragment": "core",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-05-prune-selector-removes-noise#core"
       }
     }
-  ]
+  ],
+  "snapshotId": "f81e3f270742e753c9d12ac96cd369864530ba2e05dd4654b40e1c09f7264a2e",
+  "source": {
+    "bytes": 249,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-05-prune-selector-removes-noise",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "e024c2a8466960d36a5792ba826b72df1124b31252d59544b0bf89493ce58d84",
+    "snapshotId": "f81e3f270742e753c9d12ac96cd369864530ba2e05dd4654b40e1c09f7264a2e",
+    "sourceUrl": "https://example.test/case-05-prune-selector-removes-noise"
+  },
+  "title": "Case 05",
+  "url": "https://example.test/case-05-prune-selector-removes-noise"
 }

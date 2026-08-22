@@ -7,39 +7,35 @@ import test from "node:test";
 import { extractPdfDocument } from "../src/extractors/pdf.js";
 import { assertSchema } from "./helpers/schema-validator.js";
 import { buildPdfWithPageContents } from "./helpers/pdf-builder.js";
+import { extractionFixture } from "./helpers/extraction-fixture.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixturePath = path.join(__dirname, "fixtures", "minimal.pdf");
-const fetchedAt = "2026-08-22T00:00:00.000Z";
 
 test("extracts text from a PDF buffer", async () => {
   const raw = await fs.readFile(fixturePath);
   const buffer = Buffer.from(raw);
+  const url = "https://example.test/minimal.pdf";
   const doc = await extractPdfDocument({
     buffer,
-    url: "https://example.test/minimal.pdf",
+    url,
     family: "generic",
     authority: "informative",
     documentType: "pdf",
-    snapshotId: "minimal-snapshot",
-    source: {
-      snapshotId: "minimal-snapshot",
-      sourceUrl: "https://example.test/minimal.pdf",
-      finalUrl: "https://example.test/minimal.pdf",
+    ...extractionFixture({
+      url,
+      content: buffer,
       contentType: "application/pdf",
-      charset: null,
-      bytes: raw.byteLength,
-      sha256: "fixture-sha256",
-      fetchedAt,
-      fileName: "content.pdf",
-    },
+      extractor: "pdf",
+      documentType: "pdf",
+    }),
   });
 
   await assertSchema(doc, "pdf-doc");
   const blocks = doc.sections.flatMap((section) => section.blocks || []);
   const text = blocks.map((block) => block.text || "").join(" ");
   assert.ok(text.includes("Hello PDF"), "Expected extracted PDF text to include 'Hello PDF'");
-  assert.equal(doc.extractedAt, fetchedAt);
+  assert.equal(doc.provenance.sourceSha256, doc.source.sha256);
   assert.equal(doc.pdf.engine, "@ismail-elkorchi/pdf-engine");
   assert.equal(doc.pdf.engineVersion, "0.1.0");
   assert.equal(doc.pdf.pageCount, 1);
@@ -73,24 +69,21 @@ test("preserves ordered sections and page provenance", async () => {
       "ET",
     ].join("\n"),
   ]);
+  const url = "https://example.test/structured.pdf";
   const input = {
     buffer,
-    url: "https://example.test/structured.pdf",
+    url,
     family: "generic",
     authority: "normative",
-    snapshotId: "structured-snapshot",
-    source: {
-      snapshotId: "structured-snapshot",
-      sourceUrl: "https://example.test/structured.pdf",
-      finalUrl: "https://example.test/structured.pdf",
-      contentType: "application/pdf",
-      charset: null,
-      bytes: buffer.byteLength,
-      sha256: "structured-sha256",
-      fetchedAt,
-      fileName: "content.pdf",
-    },
     documentType: "pdf",
+    ...extractionFixture({
+      url,
+      content: buffer,
+      contentType: "application/pdf",
+      extractor: "pdf",
+      authority: "normative",
+      documentType: "pdf",
+    }),
   };
 
   const first = await extractPdfDocument(input);
@@ -129,26 +122,22 @@ test("projects tables without duplicating their source rows", async () => {
     "(Gamma 8.0 mm 8.0 mm pass) Tj",
     "ET",
   ].join("\n")]);
-  const source = {
-    snapshotId: "table-snapshot",
-    sourceUrl: "https://example.test/table.pdf",
-    finalUrl: "https://example.test/table.pdf",
+  const url = "https://example.test/table.pdf";
+  const context = extractionFixture({
+    url,
+    content: buffer,
     contentType: "application/pdf",
-    charset: null,
-    bytes: buffer.byteLength,
-    sha256: "table-sha256",
-    fetchedAt,
-    fileName: "content.pdf",
-  };
+    extractor: "pdf",
+    documentType: "pdf",
+  });
 
   const doc = await extractPdfDocument({
     buffer,
-    url: source.sourceUrl,
+    url,
     family: "generic",
     authority: "informative",
-    snapshotId: source.snapshotId,
-    source,
     documentType: "pdf",
+    ...context,
   });
 
   await assertSchema(doc, "table-pdf-doc");
@@ -166,35 +155,32 @@ test("projects tables without duplicating their source rows", async () => {
 });
 
 test("returns deterministic structured diagnostics for malformed PDFs", async () => {
-  const source = {
-    snapshotId: "invalid-snapshot",
-    sourceUrl: "https://example.test/invalid.pdf",
-    finalUrl: "https://example.test/invalid.pdf",
+  const buffer = new TextEncoder().encode("not a pdf");
+  const url = "https://example.test/invalid.pdf";
+  const context = extractionFixture({
+    url,
+    content: buffer,
     contentType: "application/pdf",
-    charset: null,
-    bytes: 9,
-    sha256: "invalid-sha256",
-    fetchedAt,
-    fileName: "content.pdf",
-  };
+    extractor: "pdf",
+    documentType: "pdf",
+  });
   const doc = await extractPdfDocument({
-    buffer: new TextEncoder().encode("not a pdf"),
-    url: source.sourceUrl,
+    buffer,
+    url,
     family: "generic",
     authority: "informative",
-    snapshotId: source.snapshotId,
-    source,
     documentType: "pdf",
+    ...context,
   });
 
   await assertSchema(doc, "invalid-pdf-doc");
-  assert.equal(doc.extractedAt, fetchedAt);
+  assert.equal(doc.provenance.sourceSha256, doc.source.sha256);
   assert.equal(doc.pdf.status, "failed");
   assert.deepEqual(doc.sections, []);
   assert.ok(doc.warnings[0].startsWith("PDF extraction failed"));
 });
 
-test("requires recorded snapshot time", async () => {
+test("requires recorded source snapshot metadata", async () => {
   await assert.rejects(
     extractPdfDocument({
       buffer: new Uint8Array(),
@@ -205,6 +191,6 @@ test("requires recorded snapshot time", async () => {
       source: null,
       documentType: "pdf",
     }),
-    /requires source\.fetchedAt from the recorded snapshot/u,
+    /Recorded source snapshot metadata is required/u,
   );
 });

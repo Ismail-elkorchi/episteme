@@ -1,31 +1,28 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/case-11-block-emu-shapes",
-  "title": "Case 11",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-case-11-block-emu-shapes",
-  "source": {
-    "fixtureId": "case-11-block-emu-shapes"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "d0b5cdfc830b5bc68427c3c9415bd00c8c84603757d4ada2041e3991a4554219",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "59efd4e8c52ceb6158bdc0c4f214cec084c3b0d28ca5cb7dc79050f09e40af81"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "emu",
-      "heading": "EMU Shapes",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-11-block-emu-shapes",
             "fragment": null,
-            "path": "emu-alg:nth-of-type(1)"
+            "path": "emu-alg:nth-of-type(1)",
+            "url": "https://example.test/case-11-block-emu-shapes"
           },
-          "links": [],
-          "type": "algorithm",
-          "title": "Compute Value",
           "steps": [
             {
               "stepId": "1",
@@ -35,18 +32,14 @@
               "stepId": "2",
               "text": "Return x."
             }
-          ]
+          ],
+          "title": "Compute Value",
+          "type": "algorithm"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/case-11-block-emu-shapes",
-            "fragment": null,
-            "path": "emu-grammar:nth-of-type(1)"
-          },
           "links": [],
-          "type": "grammar",
+          "normativity": "informative",
           "productions": [
             {
               "lhs": "Expr",
@@ -56,50 +49,76 @@
               "lhs": "Term",
               "rhs": "Factor"
             }
-          ]
+          ],
+          "source": {
+            "fragment": null,
+            "path": "emu-grammar:nth-of-type(1)",
+            "url": "https://example.test/case-11-block-emu-shapes"
+          },
+          "type": "grammar"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-11-block-emu-shapes",
             "fragment": null,
-            "path": "emu-note:nth-of-type(1)"
+            "path": "emu-note:nth-of-type(1)",
+            "url": "https://example.test/case-11-block-emu-shapes"
           },
-          "links": [],
-          "type": "note",
-          "text": "Note text."
+          "text": "Note text.",
+          "type": "note"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-11-block-emu-shapes",
             "fragment": null,
-            "path": "emu-example:nth-of-type(1)"
+            "path": "emu-example:nth-of-type(1)",
+            "url": "https://example.test/case-11-block-emu-shapes"
           },
-          "links": [],
-          "type": "note",
-          "text": "Example text."
+          "text": "Example text.",
+          "type": "note"
         },
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/case-11-block-emu-shapes",
             "fragment": null,
-            "path": "emu-equation:nth-of-type(1)"
+            "path": "emu-equation:nth-of-type(1)",
+            "url": "https://example.test/case-11-block-emu-shapes"
           },
-          "links": [],
-          "type": "code",
-          "text": "x = y + z"
+          "text": "x = y + z",
+          "type": "code"
         }
       ],
+      "heading": "EMU Shapes",
+      "id": "emu",
+      "level": 1,
       "source": {
-        "url": "https://example.test/case-11-block-emu-shapes#emu",
         "fragment": "emu",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/case-11-block-emu-shapes#emu"
       }
     }
-  ]
+  ],
+  "snapshotId": "e61add573478ee6187e7f43691e67fe8d5f3d173bbce64442b970059a1adde49",
+  "source": {
+    "bytes": 553,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/case-11-block-emu-shapes",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "59efd4e8c52ceb6158bdc0c4f214cec084c3b0d28ca5cb7dc79050f09e40af81",
+    "snapshotId": "e61add573478ee6187e7f43691e67fe8d5f3d173bbce64442b970059a1adde49",
+    "sourceUrl": "https://example.test/case-11-block-emu-shapes"
+  },
+  "title": "Case 11",
+  "url": "https://example.test/case-11-block-emu-shapes"
 }

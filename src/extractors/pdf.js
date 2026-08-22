@@ -1,4 +1,5 @@
 import { createPdfEngine } from "@ismail-elkorchi/pdf-engine";
+import { documentBase } from "../document.js";
 
 const SUCCESS_STATUSES = new Set(["completed", "partial"]);
 
@@ -11,19 +12,18 @@ export async function extractPdfDocument({
   source,
   documentType,
   title,
+  provenance,
 }) {
-  const extractedAt = requireSnapshotTimestamp(source);
-  const baseDocument = {
-    schemaVersion: "0.1",
+  const baseDocument = documentBase({
     url,
-    title: title || url,
-    family: family || "generic",
-    authority: authority || "informative",
-    documentType: documentType || null,
-    snapshotId: snapshotId || null,
-    source: source || null,
-    extractedAt,
-  };
+    title,
+    family,
+    authority,
+    documentType,
+    snapshotId,
+    source,
+    provenance,
+  });
   const engine = createPdfEngine();
   let document;
 
@@ -107,13 +107,6 @@ export async function extractPdfDocument({
       await engine.dispose();
     }
   }
-}
-
-function requireSnapshotTimestamp(source) {
-  if (typeof source?.fetchedAt !== "string" || source.fetchedAt.length === 0) {
-    throw new TypeError("PDF extraction requires source.fetchedAt from the recorded snapshot");
-  }
-  return source.fetchedAt;
 }
 
 function normalizePdfBytes(input) {

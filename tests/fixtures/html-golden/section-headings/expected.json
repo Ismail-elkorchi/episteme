@@ -1,84 +1,103 @@
 {
-  "schemaVersion": "0.1",
-  "url": "https://example.test/section-headings",
-  "title": "Headings Document",
-  "family": "generic",
   "authority": "informative",
+  "contentTrust": "untrusted-source",
   "documentType": null,
-  "snapshotId": "fixture-section-headings",
-  "source": {
-    "fixtureId": "section-headings"
+  "family": "generic",
+  "provenance": {
+    "configurationSha256": "22478b9668d024ea128fdd260a6acc0e8c7a90721ad7cb0e5d4de0d2601ca368",
+    "extractor": "html",
+    "producer": "episteme",
+    "producerVersion": "0.1.0",
+    "sourceSha256": "67a1dcb4c6787177715c11581f2006a7a24d3ea90504820252e68908ef63d9bc"
   },
+  "schemaVersion": "1",
   "sections": [
     {
-      "id": "intro",
-      "heading": "Introduction",
-      "level": 1,
       "blocks": [
         {
           "id": null,
+          "links": [],
           "normativity": "informative",
           "source": {
-            "url": "https://example.test/section-headings",
             "fragment": null,
-            "path": "p:nth-of-type(1)"
+            "path": "p:nth-of-type(1)",
+            "url": "https://example.test/section-headings"
           },
-          "links": [],
-          "type": "paragraph",
-          "text": "First paragraph."
+          "text": "First paragraph.",
+          "type": "paragraph"
         },
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/section-headings",
-            "fragment": null,
-            "path": "p:nth-of-type(2)"
-          },
           "links": [
             {
-              "text": "terms",
               "href": "#terms",
-              "resolvedId": "terms"
+              "resolvedId": "terms",
+              "text": "terms"
             }
           ],
-          "type": "paragraph",
-          "text": "Second paragraph with terms."
+          "normativity": "informative",
+          "source": {
+            "fragment": null,
+            "path": "p:nth-of-type(2)",
+            "url": "https://example.test/section-headings"
+          },
+          "text": "Second paragraph with terms.",
+          "type": "paragraph"
         }
       ],
+      "heading": "Introduction",
+      "id": "intro",
+      "level": 1,
       "source": {
-        "url": "https://example.test/section-headings#intro",
         "fragment": "intro",
-        "path": "h1:nth-of-type(1)"
+        "path": "h1:nth-of-type(1)",
+        "url": "https://example.test/section-headings#intro"
       }
     },
     {
-      "id": "terms",
-      "heading": "Terms",
-      "level": 2,
       "blocks": [
         {
           "id": null,
-          "normativity": "informative",
-          "source": {
-            "url": "https://example.test/section-headings",
-            "fragment": null,
-            "path": "ul:nth-of-type(1)"
-          },
-          "links": [],
-          "type": "list",
-          "ordered": false,
           "items": [
             "Alpha",
             "Beta"
-          ]
+          ],
+          "links": [],
+          "normativity": "informative",
+          "ordered": false,
+          "source": {
+            "fragment": null,
+            "path": "ul:nth-of-type(1)",
+            "url": "https://example.test/section-headings"
+          },
+          "type": "list"
         }
       ],
+      "heading": "Terms",
+      "id": "terms",
+      "level": 2,
       "source": {
-        "url": "https://example.test/section-headings#terms",
         "fragment": "terms",
-        "path": "h2:nth-of-type(1)"
+        "path": "h2:nth-of-type(1)",
+        "url": "https://example.test/section-headings#terms"
       }
     }
-  ]
+  ],
+  "snapshotId": "cbcb37292e50880576d1045717351364d9b8c472f29139d309eb61c443bcecec",
+  "source": {
+    "bytes": 296,
+    "charset": "utf8",
+    "contentType": "text/html; charset=utf-8",
+    "etag": null,
+    "fetchedAt": "2026-08-22T00:00:00.000Z",
+    "fileName": "content.html",
+    "finalUrl": "https://example.test/section-headings",
+    "lastModified": null,
+    "schemaVersion": "1",
+    "sha256": "67a1dcb4c6787177715c11581f2006a7a24d3ea90504820252e68908ef63d9bc",
+    "snapshotId": "cbcb37292e50880576d1045717351364d9b8c472f29139d309eb61c443bcecec",
+    "sourceUrl": "https://example.test/section-headings"
+  },
+  "title": "Headings Document",
+  "url": "https://example.test/section-headings"
 }

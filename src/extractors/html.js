@@ -1,3 +1,5 @@
+import { documentBase } from "../document.js";
+
 export function extractHtmlDocument({
   rules,
   url,
@@ -6,6 +8,7 @@ export function extractHtmlDocument({
   snapshotId,
   source,
   documentType,
+  provenance,
   dom,
 }) {
   const config = rules || {};
@@ -67,15 +70,16 @@ export function extractHtmlDocument({
 
   const title = doc?.title || (sections[0]?.heading ?? "Untitled");
   return {
-    schemaVersion: "0.1",
-    url: url || locationRef?.href || "",
-    title,
-    family: family || "generic",
-    authority: documentAuthority,
-    documentType: documentType || null,
-    snapshotId: snapshotId || null,
-    source: source || null,
-    extractedAt: new Date().toISOString(),
+    ...documentBase({
+      url: url || locationRef?.href || "",
+      title,
+      family,
+      authority: documentAuthority,
+      documentType,
+      snapshotId,
+      source,
+      provenance,
+    }),
     sections,
   };
 
