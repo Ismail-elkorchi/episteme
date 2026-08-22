@@ -48,7 +48,6 @@
     "check": "npm run test:coverage",
     "check:audit": "npm audit --audit-level=high",
     "check:deno": "deno test --no-check --allow-read --allow-write --allow-net --allow-env --node-modules-dir=manual tests",
-    "check:bun": "bun test tests",
     "package:check": "node scripts/verify-package.mjs",
     "package:check:jsr": "deno publish --dry-run",
     "check:ci": "npm run check && npm run check:audit && npm run package:check"
@@ -56,6 +55,7 @@
   "dependencies": {
     "@ismail-elkorchi/css-parser": "^0.2.0",
     "@ismail-elkorchi/html-parser": "^0.2.1",
+    "@ismail-elkorchi/http-client": "0.1.1",
     "@ismail-elkorchi/pdf-engine": "0.1.0",
     "@ismail-elkorchi/xml-parser": "^0.2.0"
   },

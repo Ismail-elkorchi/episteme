@@ -97,6 +97,12 @@ Use `episteme <command> --help` for exact options, defaults, and limits. In part
 capture has configurable time, byte, retry, and source-count limits; chunk and query output
 have independent character and result limits.
 
+Snapshot targets are restricted to public network addresses by default. Use
+`--allow-localhost` to admit loopback and localhost targets, and
+`--allow-private-networks` to admit private-use network targets. These permissions are
+independent; private-network access does not also permit localhost or other special-purpose
+addresses.
+
 Manifests and manual-ingest maps accept `-` as a bounded stdin input. Query indexes also accept
 stdin, with a larger default bound suitable for corpus indexes. Override either bound explicitly
 with `--max-input-bytes`. `index --out -` and `diff --out -` require `--json`; the generated
@@ -182,6 +188,6 @@ rebuild hint instead of silently returning obsolete evidence.
 
 ## Compatibility
 
-The full pipeline supports Node.js 24+, the pinned Deno release, and the pinned Bun release.
-Runtime-specific CLI subprocess tests execute on Node; the portable extraction and pipeline
-modules are tested on all three runtimes.
+The full pipeline supports Node.js 24+ and the pinned Deno release. Runtime-specific CLI
+subprocess tests execute on Node; the portable extraction and pipeline modules are tested on
+both runtimes.

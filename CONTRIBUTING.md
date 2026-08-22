@@ -8,7 +8,7 @@
 
 ## Local verification
 
-Install with `npm ci`, then run `npm run check:ci` before opening a PR. Changes to extractors, dependencies, or runtime behavior must also pass `npm run check:deno` and `npm run check:bun`.
+Install with `npm ci`, then run `npm run check:ci` before opening a PR. Changes to extractors, dependencies, or runtime behavior must also pass `npm run check:deno`.
 
 Keep documentation in the present tense and aligned with current behavior.
 

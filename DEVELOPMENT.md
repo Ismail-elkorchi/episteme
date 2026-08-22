@@ -63,12 +63,11 @@ Tests should prove contracts rather than normalize failures away. In particular:
 ```sh
 npm run check:ci
 npm run check:deno
-npm run check:bun
 ```
 
 `check:ci` runs coverage thresholds, a high-severity dependency audit, and the npm package
-allowlist check. Deno and Bun validate portable modules; Node-only CLI subprocess tests are
-skipped on those runtimes.
+allowlist check. Deno validates portable modules; Node-only CLI subprocess tests are skipped on
+that runtime.
 
 Run `npm run package:check:jsr -- --allow-dirty` while preparing a JSR packaging change. The
 release workflow runs the same dry-run from a clean tag checkout without `--allow-dirty`.

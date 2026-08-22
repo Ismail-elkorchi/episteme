@@ -29,4 +29,4 @@ Repository guidance for contributors and coding agents.
 
 - Product or extractor changes: `npm run check`.
 - Packaging, dependency, schema, or release changes: `npm run check:ci`.
-- Cross-runtime changes: also run `npm run check:deno` and `npm run check:bun`.
+- Cross-runtime changes: also run `npm run check:deno`.
