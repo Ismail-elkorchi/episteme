@@ -50,7 +50,7 @@ npx episteme pipeline --manifest ./manifest.json
 npx episteme query --index ./chunks/search-index.json --term "popover algorithm" --limit 5
 ```
 
-The parser and PDF-engine dependencies are included by the package.
+The Clivoke command parser and PDF-engine dependencies are included by the package.
 
 The same CLI is published to JSR as `@ismail-elkorchi/episteme`. Its entrypoint is named
 `./cli` so importing the package cannot accidentally execute a command:
