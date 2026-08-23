@@ -21,10 +21,15 @@ const expectedJsrIncludes = [
 ];
 const expectedJsrImports = {
   "@ismail-elkorchi/http-client": "jsr:@ismail-elkorchi/http-client@0.1.1",
+  "clivoke": "jsr:@ismail-elkorchi/clivoke@0.2.0",
 };
 const expectedMinimumDependencyAge = {
   age: "P1D",
-  exclude: ["jsr:@ismail-elkorchi/http-client"],
+  exclude: [
+    "jsr:@ismail-elkorchi/http-client",
+    "jsr:@ismail-elkorchi/clivoke",
+    "jsr:@ismail-elkorchi/cli-core",
+  ],
 };
 
 function fail(message) {

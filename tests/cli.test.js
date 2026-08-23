@@ -28,7 +28,7 @@ test("shows conventional human-readable help by default", { skip: !isNode }, () 
   const result = runCli([]);
   assert.equal(result.status, 0);
   assert.equal(result.stderr, "");
-  assert.match(result.stdout, /Usage:\n  episteme <command>/u);
+  assert.match(result.stdout, /Usage: episteme \[options\] <command>/u);
   assert.match(result.stdout, /Commands:/u);
   assert.match(result.stdout, /query\s+Return bounded, ranked evidence/u);
   assert.doesNotMatch(result.stdout, /^\{/u);
@@ -46,7 +46,8 @@ test("supports top-level and command help, including help with --json", { skip: 
     const result = runCli(args);
     assert.equal(result.status, 0, args.join(" "));
     assert.equal(result.stderr, "");
-    assert.match(result.stdout, /episteme query --term <query>/u);
+    assert.match(result.stdout, /Usage: episteme query \[options\]/u);
+    assert.match(result.stdout, /--term <query>\s+Lexical search query\. \[required\]/u);
     assert.match(result.stdout, /--limit/u);
   }
 });
@@ -57,6 +58,13 @@ test("removes describe without a compatibility command", { skip: !isNode }, () =
   assert.equal(result.stdout, "");
   assert.match(result.stderr, /^error: Unknown command: describe/u);
   assert.doesNotMatch(result.stderr, /^\{/u);
+});
+
+test("reports the unknown help target instead of the built-in help command", { skip: !isNode }, () => {
+  const result = runCli(["help", "missing"]);
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, "");
+  assert.match(result.stderr, /^error: Unknown command: missing/u);
 });
 
 test("uses human output by default and JSON only under --json", { skip: !isNode }, async () => {
@@ -101,11 +109,11 @@ test("reports human errors by default and schema-valid errors under --json", { s
 test("validates typed options, stdout artifacts, and progress mode before work", { skip: !isNode }, () => {
   const missing = runCli(["diff"]);
   assert.equal(missing.status, 2);
-  assert.match(missing.stderr, /requires --from/u);
+  assert.match(missing.stderr, /Required option "from" was not specified/u);
 
   const invalidLimit = runCli(["query", "--term", "evidence", "--limit", "0"]);
   assert.equal(invalidLimit.status, 2);
-  assert.match(invalidLimit.stderr, /must be an integer/u);
+  assert.match(invalidLimit.stderr, /must be between 1 and 100/u);
 
   const stdoutArtifact = runCli(["index", "--out", "-"]);
   assert.equal(stdoutArtifact.status, 2);
@@ -119,6 +127,25 @@ test("validates typed options, stdout artifacts, and progress mode before work",
   assert.equal(networkHelp.status, 0);
   assert.match(networkHelp.stdout, /--allow-localhost/u);
   assert.match(networkHelp.stdout, /--allow-private-networks/u);
+});
+
+test("classifies JSON and debug intent with the configured option grammar", { skip: !isNode }, async () => {
+  const optionValue = runCli(["query", "--term", "--json"]);
+  assert.notEqual(optionValue.status, 0);
+  assert.equal(optionValue.stdout, "");
+  assert.match(optionValue.stderr, /^error: /u);
+  assert.doesNotMatch(optionValue.stderr, /^\{/u);
+
+  const rejectedOptionValue = runCli(["query", "--term", "evidence", "--limit", "--json"]);
+  assert.equal(rejectedOptionValue.status, 2);
+  assert.match(rejectedOptionValue.stderr, /^error: /u);
+  assert.doesNotMatch(rejectedOptionValue.stderr, /^\{/u);
+
+  const selectedJson = runCli(["unknown", "--json"]);
+  const envelope = parseOnlyLine(selectedJson.stderr);
+  await assertCliEnvelope(envelope);
+  assert.equal(envelope.ok, false);
+  assert.equal(envelope.command, "unknown");
 });
 
 test("runs the successful agent workflow through the executable", { skip: !isNode }, async (t) => {

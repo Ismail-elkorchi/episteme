@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 /* @ts-self-types="./cli.d.ts" */
 import path from "node:path";
-import { parseInvocation, detectGlobalIntent, renderHelp } from "./cli-contract.js";
+import {
+  commandFromArgv,
+  inspectGlobalOptions,
+  parseInvocation,
+  renderHelp,
+} from "./cli-definition.js";
 import { ARTIFACT_SCHEMA_VERSION, EPISTEME_VERSION } from "./constants.js";
 import { cancelledError, normalizeError, throwIfAborted } from "./errors.js";
 import { createProgressReporter, withOutputLocks } from "./execution.js";
@@ -20,7 +25,7 @@ await main(process.argv.slice(2), cancellation.signal);
 cancellation.dispose();
 
 async function main(argv, signal) {
-  const intent = detectGlobalIntent(argv);
+  const intent = inspectGlobalOptions(argv);
   let invocation = null;
   let progress = () => {};
   try {
@@ -400,28 +405,6 @@ function debugDetails(error) {
     current = current.cause;
   }
   return { causes, issueUrl: "https://github.com/Ismail-elkorchi/episteme/issues" };
-}
-
-function commandFromArgv(argv) {
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token === "--progress") {
-      index += 1;
-      continue;
-    }
-    if (
-      token === "--json" ||
-      token === "--debug" ||
-      token === "--help" ||
-      token === "-h" ||
-      token === "--version" ||
-      token.startsWith("--progress=")
-    ) {
-      continue;
-    }
-    if (!token.startsWith("-")) return token;
-  }
-  return null;
 }
 
 function installCancellationHandlers() {

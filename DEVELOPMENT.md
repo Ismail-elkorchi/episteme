@@ -12,7 +12,8 @@ npm test
 ## Repository layout
 
 - `src/cli.js`: process boundary and command execution.
-- `src/cli-contract.js`: the single source for command discovery, typed options, and defaults.
+- `src/cli-definition.js`: the declarative Clivoke source for command discovery, typed options,
+  defaults, examples, and help.
 - `src/errors.js`: stable machine-facing error and exit-code model.
 - `src/document.js`: extracted-document and transformation-provenance construction.
 - `src/pipeline/`: capture, extraction, chunking, indexing/query, and diff stages.
@@ -25,12 +26,17 @@ HTML extraction uses `@ismail-elkorchi/html-parser` and `@ismail-elkorchi/css-pa
 XML extraction uses `@ismail-elkorchi/xml-parser`; PDF extraction uses
 `@ismail-elkorchi/pdf-engine`. No sibling repository is required.
 
+Clivoke owns command routing, argv parsing, grammar-aware flag inspection, and help rendering.
+Episteme owns product validation, domain error and exit-code policy, progress, cancellation,
+locking, command execution, and human or JSON result rendering. Do not route execution through
+Clivoke's generic main adapter because it cannot preserve Episteme's domain failure contract.
+
 ## Design invariants
 
-- Keep command definitions in `cli-contract.js`; do not add independent parsing/help metadata.
+- Keep command definitions in `cli-definition.js`; do not add independent parsing/help metadata.
 - Keep normal output concise and human-readable. Emit the versioned envelope only under `--json`.
 - Keep results on stdout, diagnostics and progress on stderr, and help human-readable in every mode.
-- Treat schema and CLI-contract changes as intentional breaking changes until a compatibility policy exists.
+- Treat schema and CLI-definition changes as intentional breaking changes until a compatibility policy exists.
 - Never add implicit compatibility transforms for old artifacts.
 - Keep wall-clock time out of all artifacts derived from a recorded snapshot.
 - Hash deterministic canonical content, not formatted display output or execution time.

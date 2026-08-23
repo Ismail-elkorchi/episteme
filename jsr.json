@@ -6,12 +6,15 @@
     "./cli": "./src/cli.js"
   },
   "imports": {
-    "@ismail-elkorchi/http-client": "jsr:@ismail-elkorchi/http-client@0.1.1"
+    "@ismail-elkorchi/http-client": "jsr:@ismail-elkorchi/http-client@0.1.1",
+    "clivoke": "jsr:@ismail-elkorchi/clivoke@0.2.0"
   },
   "minimumDependencyAge": {
     "age": "P1D",
     "exclude": [
-      "jsr:@ismail-elkorchi/http-client"
+      "jsr:@ismail-elkorchi/http-client",
+      "jsr:@ismail-elkorchi/clivoke",
+      "jsr:@ismail-elkorchi/cli-core"
     ]
   },
   "publish": {
