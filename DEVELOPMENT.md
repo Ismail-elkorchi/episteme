@@ -26,10 +26,12 @@ HTML extraction uses `@ismail-elkorchi/html-parser` and `@ismail-elkorchi/css-pa
 XML extraction uses `@ismail-elkorchi/xml-parser`; PDF extraction uses
 `@ismail-elkorchi/pdf-engine`. No sibling repository is required.
 
-Clivoke owns command routing, argv parsing, grammar-aware flag inspection, and help rendering.
-Episteme owns product validation, domain error and exit-code policy, progress, cancellation,
-locking, command execution, and human or JSON result rendering. Do not route execution through
-Clivoke's generic main adapter because it cannot preserve Episteme's domain failure contract.
+Clivoke owns command routing, argv parsing, retained grammar-aware flag inspection, help
+formatting, handler dispatch, and awaited final output delivery. Episteme supplies the main
+runner's rendering hooks and owns product validation, domain errors and exit codes, progress,
+cancellation, locking, command execution, and human or JSON result content. Use the runner's
+retained inspection for help, version, and invalid invocations; do not rescan argv or catch
+output-delivery failures as domain execution errors. Product validation must precede locks.
 
 ## Design invariants
 

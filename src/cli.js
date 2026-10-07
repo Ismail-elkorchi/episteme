@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 /* @ts-self-types="./cli.d.ts" */
 import path from "node:path";
+import { createProcessCliHost, runCliMain } from "clivoke";
 import {
-  commandFromArgv,
-  inspectGlobalOptions,
-  parseInvocation,
+  EPISTEME_CLI,
+  commandInvocation,
+  globalIntent,
+  inspectedCommand,
+  invalidUsage,
   renderHelp,
 } from "./cli-definition.js";
 import { ARTIFACT_SCHEMA_VERSION, EPISTEME_VERSION } from "./constants.js";
@@ -21,74 +24,78 @@ import { manualIngest } from "./pipeline/manual-ingest.js";
 import { canonicalJson } from "./utils.js";
 
 const cancellation = installCancellationHandlers();
-await main(process.argv.slice(2), cancellation.signal);
-cancellation.dispose();
-
-async function main(argv, signal) {
-  const intent = inspectGlobalOptions(argv);
-  let invocation = null;
-  let progress = () => {};
-  try {
-    invocation = parseInvocation(argv);
-    if (invocation.action === "help") {
-      process.stdout.write(`${renderHelp(invocation.command)}\n`);
-      return;
-    }
-    if (invocation.action === "version") {
-      if (invocation.global.json) writeSuccess("version", { name: "episteme", version: EPISTEME_VERSION }, []);
-      else process.stdout.write(`episteme ${EPISTEME_VERSION}\n`);
-      return;
-    }
-
-    progress = createProgressReporter({
-      command: invocation.command,
-      mode: invocation.global.progress,
-      json: invocation.global.json,
-    });
-    const context = { signal, onProgress: progress, stdin: process.stdin };
-    const targets = lockTargets(invocation);
-    const { data, warnings = [] } = await withOutputLocks(
-      targets,
-      () => execute(invocation, context),
-      { command: invocation.command },
-    );
-    throwIfAborted(signal);
-    if (invocation.global.json) writeSuccess(invocation.command, data, warnings);
-    else writeHumanSuccess(invocation.command, data, warnings);
-  } catch (caught) {
-    const interrupted = signal.aborted && caught?.code !== "CANCELLED"
-      ? cancelledError(typeof signal.reason === "string" ? signal.reason : "SIGINT")
-      : caught;
-    const error = normalizeError(interrupted);
-    progress({ stage: invocation?.command || "episteme", message: error.message, status: "failed" });
-    const global = invocation?.global || intent;
-    if (global.json) writeJsonError(invocation?.command || commandFromArgv(argv), error, global.debug);
-    else writeHumanError(invocation?.command || commandFromArgv(argv), error, global.debug);
-    process.exitCode = error.exitCode;
-  }
+try {
+  await main(cancellation.signal);
+} finally {
+  cancellation.dispose();
 }
 
-async function execute({ command, options }, context) {
-  switch (command) {
-    case "snapshot":
-      return runSnapshot(options, context);
-    case "manual-ingest":
-      return runManualIngest(options, context);
-    case "extract":
-      return runExtract(options, context);
-    case "chunk":
-      return runChunk(options, context);
-    case "index":
-      return runIndex(options, context);
-    case "query":
-      return runQuery(options, context);
-    case "diff":
-      return runDiff(options, context);
-    case "pipeline":
-      return runPipeline(options, context);
-    default:
-      throw new Error(`Unimplemented command: ${command}`);
-  }
+async function main(signal) {
+  const context = { signal, progress: () => {} };
+  const operations = {
+    snapshot: runSnapshot,
+    "manual-ingest": runManualIngest,
+    extract: runExtract,
+    chunk: runChunk,
+    index: runIndex,
+    query: runQuery,
+    diff: runDiff,
+    pipeline: runPipeline,
+  };
+  const handlers = Object.fromEntries(Object.entries(operations).map(([command, operation]) => [
+    `episteme ${command}`,
+    async ({ invocation }) => {
+      // Product validation must complete before acquiring any output locks.
+      const selected = commandInvocation(invocation);
+      context.progress = createProgressReporter({
+        command,
+        mode: selected.global.progress,
+        json: selected.global.json,
+      });
+      const execution = { signal, onProgress: context.progress, stdin: process.stdin };
+      const { data, warnings = [] } = await withOutputLocks(
+        lockTargets(selected),
+        () => operation(selected.options, execution),
+        { command },
+      );
+      throwIfAborted(signal);
+      return selected.global.json
+        ? { stdout: successEnvelope(command, data, warnings) }
+        : humanSuccess(command, data, warnings);
+    },
+  ]));
+  return runCliMain({
+    cli: EPISTEME_CLI,
+    host: createProcessCliHost(process),
+    context,
+    handlers,
+    renderHelp: (help) => ({ stdout: renderHelp(help) }),
+    renderVersion: (_version, { inspection }) => ({
+      stdout: globalIntent(inspection).json
+        ? successEnvelope("version", { name: "episteme", version: EPISTEME_VERSION }, [])
+        : `episteme ${EPISTEME_VERSION}`,
+    }),
+    renderInvalid: (result, { inspection }) => failureOutput(
+      invalidUsage(result), inspectedCommand(inspection), globalIntent(inspection), context,
+    ),
+    renderFailure: ({ error }, { result }) => failureOutput(
+      error, result.command.path[0], result.optionValues, context,
+    ),
+  });
+}
+
+function failureOutput(caught, command, global, { signal, progress }) {
+  const interrupted = signal.aborted && caught?.code !== "CANCELLED"
+    ? cancelledError(typeof signal.reason === "string" ? signal.reason : "SIGINT")
+    : caught;
+  const error = normalizeError(interrupted);
+  progress({ stage: command || "episteme", message: error.message, status: "failed" });
+  return {
+    stderr: global.json
+      ? jsonError(command, error, global.debug)
+      : humanError(command, error, global.debug),
+    exitCode: error.exitCode,
+  };
 }
 
 async function runSnapshot(options, context) {
@@ -286,12 +293,12 @@ function outputPath(value) {
   return value === "-" ? "-" : path.resolve(process.cwd(), value);
 }
 
-function writeSuccess(command, data, warnings) {
-  writeEnvelope(process.stdout, { ok: true, command, data, warnings, error: null });
+function successEnvelope(command, data, warnings) {
+  return renderEnvelope({ ok: true, command, data, warnings, error: null });
 }
 
-function writeJsonError(command, error, debug) {
-  writeEnvelope(process.stderr, {
+function jsonError(command, error, debug) {
+  return renderEnvelope({
     ok: false,
     command,
     data: null,
@@ -306,18 +313,20 @@ function writeJsonError(command, error, debug) {
   });
 }
 
-function writeEnvelope(stream, fields) {
+function renderEnvelope(fields) {
   const envelope = {
     schemaVersion: ARTIFACT_SCHEMA_VERSION,
     ...fields,
     meta: { epistemeVersion: EPISTEME_VERSION },
   };
-  stream.write(`${canonicalJson(envelope)}\n`);
+  return canonicalJson(envelope);
 }
 
-function writeHumanSuccess(command, data, warnings) {
-  process.stdout.write(`${terminalSafe(renderHumanResult(command, data))}\n`);
-  for (const warning of warnings) process.stderr.write(`warning: ${terminalSafe(warning.message)}\n`);
+function humanSuccess(command, data, warnings) {
+  return {
+    stdout: terminalSafe(renderHumanResult(command, data)),
+    stderr: warnings.map((warning) => `warning: ${terminalSafe(warning.message)}`).join("\n"),
+  };
 }
 
 function renderHumanResult(command, data) {
@@ -375,7 +384,7 @@ function renderQuery(data) {
   return lines.join("\n");
 }
 
-function writeHumanError(command, error, debug) {
+function humanError(command, error, debug) {
   const lines = [`error: ${error.message}`];
   const hint = error.details?.hint || (command ? `Run 'episteme ${command} --help'.` : "Run 'episteme --help'.");
   if (hint) lines.push(`hint: ${hint}`);
@@ -388,7 +397,7 @@ function writeHumanError(command, error, debug) {
       lines.push("", `${cause.name}: ${cause.message}`, cause.stack || "");
     }
   }
-  process.stderr.write(`${terminalSafe(lines.filter(Boolean).join("\n"))}\n`);
+  return terminalSafe(lines.filter(Boolean).join("\n"));
 }
 
 function terminalSafe(value) {

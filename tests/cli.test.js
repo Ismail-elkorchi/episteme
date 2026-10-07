@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { withOutputLocks } from "../src/execution.js";
 import { assertArtifact, assertCliEnvelope } from "./helpers/schema-validator.js";
 
 const isNode = typeof globalThis.Deno === "undefined";
@@ -123,6 +124,11 @@ test("validates typed options, stdout artifacts, and progress mode before work",
   assert.equal(invalidProgress.status, 2);
   assert.match(invalidProgress.stderr, /auto, always, never/u);
 
+  const malformedHelp = runCli(["query", "--term", "evidence", "-h?"]);
+  assert.equal(malformedHelp.status, 2);
+  assert.equal(malformedHelp.stdout, "");
+  assert.match(malformedHelp.stderr, /^error: /u);
+
   const networkHelp = runCli(["snapshot", "--help"]);
   assert.equal(networkHelp.status, 0);
   assert.match(networkHelp.stdout, /--allow-localhost/u);
@@ -141,11 +147,71 @@ test("classifies JSON and debug intent with the configured option grammar", { sk
   assert.match(rejectedOptionValue.stderr, /^error: /u);
   assert.doesNotMatch(rejectedOptionValue.stderr, /^\{/u);
 
+  const ambiguousTail = runCli(["unknown", "--term", "--json"]);
+  assert.equal(ambiguousTail.status, 2);
+  assert.match(ambiguousTail.stderr, /^error: /u);
+  assert.doesNotMatch(ambiguousTail.stderr, /^\{/u);
+
   const selectedJson = runCli(["unknown", "--json"]);
   const envelope = parseOnlyLine(selectedJson.stderr);
   await assertCliEnvelope(envelope);
   assert.equal(envelope.ok, false);
   assert.equal(envelope.command, "unknown");
+});
+
+test("malformed globals preserve child option values and output policy", { skip: !isNode }, async () => {
+  for (const term of ["--help", "--version", "--json", "--debug"]) {
+    const human = runCli(["query", "--term", term, "--progress"]);
+    assert.equal(human.status, 2, term);
+    assert.equal(human.stdout, "", term);
+    assert.match(human.stderr, /^error: Flag "--progress" requires a value\./u);
+    assert.match(human.stderr, /Run 'episteme query --help'/u);
+    assert.doesNotMatch(human.stderr, /EpistemeError:|at failureOutput|^\{/u);
+
+    const machine = runCli(["query", "--term", term, "--json", "--progress"]);
+    assert.equal(machine.status, 2, term);
+    assert.equal(machine.stdout, "");
+    const envelope = parseOnlyLine(machine.stderr);
+    await assertCliEnvelope(envelope);
+    assert.equal(envelope.command, "query");
+    assert.equal(envelope.error.code, "INVALID_USAGE");
+    assert.equal(envelope.error.debug, undefined);
+  }
+  const debug = runCli(["query", "--term", "--debug", "--debug", "--json", "--progress"]);
+  assert.equal(debug.status, 2);
+  assert.ok(parseOnlyLine(debug.stderr).error.debug.causes.length > 0);
+});
+
+test("domain failures retain exit codes and validation precedes locks", { skip: !isNode }, async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "episteme-cli-policy-"));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const invalid = runCli([
+    "chunk", "--input", path.join(root, "input"), "--out", path.join(root, "output"),
+    "--max-chars", "256", "--overlap-chars", "400", "--json",
+  ]);
+  assert.equal(invalid.status, 2);
+  assert.equal(parseOnlyLine(invalid.stderr).error.code, "INVALID_USAGE");
+  assert.deepEqual(await fs.readdir(root), []);
+
+  const missing = runCli(["query", "--index", path.join(root, "missing"), "--term", "x", "--json"]);
+  assert.equal(missing.status, 3);
+  assert.equal(missing.stdout, "");
+  const missingEnvelope = parseOnlyLine(missing.stderr);
+  await assertCliEnvelope(missingEnvelope);
+  assert.equal(missingEnvelope.error.code, "INVALID_INPUT");
+  assert.equal(missingEnvelope.error.retryable, false);
+
+  const chunks = path.join(root, "chunks");
+  await withOutputLocks([chunks], async () => {
+    const busy = runCli(["index", "--chunks", chunks, "--out", path.join(root, "index.json"), "--json"]);
+    assert.equal(busy.status, 7);
+    assert.equal(busy.stdout, "");
+    const envelope = parseOnlyLine(busy.stderr);
+    await assertCliEnvelope(envelope);
+    assert.equal(envelope.error.code, "RESOURCE_BUSY");
+    assert.equal(envelope.error.retryable, true);
+  });
+  assert.deepEqual(await fs.readdir(root), []);
 });
 
 test("runs the successful agent workflow through the executable", { skip: !isNode }, async (t) => {
