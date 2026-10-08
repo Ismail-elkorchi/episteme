@@ -58,7 +58,7 @@
     "@ismail-elkorchi/http-client": "0.1.1",
     "@ismail-elkorchi/pdf-engine": "0.1.0",
     "@ismail-elkorchi/xml-parser": "^0.2.0",
-    "clivoke": "0.2.0"
+    "clivoke": "git+https://github.com/Ismail-elkorchi/clivoke.git#9f0e20835876fd2f6dd263969624aa056b9d0c16"
   },
   "license": "MIT",
   "devDependencies": {

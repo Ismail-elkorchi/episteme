@@ -1,8 +1,6 @@
 import {
   createCli,
-  createCliHelp,
   formatCliHelp,
-  inspectCliArgv,
   value,
 } from "clivoke";
 import { EPISTEME_VERSION } from "./constants.js";
@@ -260,53 +258,31 @@ export const EPISTEME_CLI = createCli({
   ],
 });
 
-export function parseInvocation(argv) {
-  const result = EPISTEME_CLI.parse({ argv });
-  if (result.status === "help") {
-    return {
-      action: "help",
-      command: result.commandPath[0] ?? null,
-      options: Object.freeze({}),
-      global: inspectGlobalOptions(argv),
-    };
-  }
-  if (result.status === "version") {
-    return {
-      action: "version",
-      command: "version",
-      options: Object.freeze({}),
-      global: inspectGlobalOptions(argv),
-    };
-  }
-  if (result.status === "invalid") throw invalidUsage(result);
-
+export function commandInvocation(result) {
   const command = result.command.path[0];
   if (command === undefined) throw new Error("Clivoke selected the non-invokable root command.");
   const { json, debug, progress, ...options } = result.optionValues;
   validateCommandOptions(command, options, Boolean(json));
   return {
-    action: "run",
     command,
     options: Object.freeze(options),
     global: Object.freeze({ json: Boolean(json), debug: Boolean(debug), progress }),
   };
 }
 
-export function inspectGlobalOptions(argv) {
-  const inspection = inspectCliArgv(EPISTEME_CLI, argv);
-  const names = new Set(inspection.options.map((option) => option.option));
+export function globalIntent(inspection) {
+  const names = new Set(inspection.options
+    .filter((option) => option.state === "boolean")
+    .map((option) => option.option));
   return Object.freeze({ json: names.has("json"), debug: names.has("debug") });
 }
 
-export function commandFromArgv(argv) {
-  const inspection = inspectCliArgv(EPISTEME_CLI, argv);
+export function inspectedCommand(inspection) {
   return inspection.commandPath[0] ?? inspection.positionalArguments[0]?.value ?? null;
 }
 
-export function renderHelp(command = null) {
-  const help = createCliHelp(EPISTEME_CLI, command === null ? [] : [command]);
-  if (help === undefined) throw usageError(`Unknown command: ${command}`);
-  const title = command === null ? `Episteme ${EPISTEME_VERSION}\n\n` : "";
+export function renderHelp(help) {
+  const title = help.command.path.length === 0 ? `Episteme ${EPISTEME_VERSION}\n\n` : "";
   return [
     `${title}${formatCliHelp(help)}`,
     "",
@@ -324,7 +300,7 @@ function validateCommandOptions(command, options, json) {
   }
 }
 
-function invalidUsage(result) {
+export function invalidUsage(result) {
   const diagnostic = result.diagnostics.find((candidate) => candidate.severity === "error") ??
     result.diagnostics[0];
   const command = result.command?.path[0];
